@@ -1,26 +1,26 @@
 struct Quad
 {
-	float Edges[4] : SV_TessFactor;
-	float Inside[2] : SV_InsideTessFactor;
+    float Edges[4] : SV_TessFactor;
+    float Inside[2] : SV_InsideTessFactor;
 };
 
 struct HullShaderOutput
 {
-	float4 position : SV_POSITION;
+    float4 position : SV_POSITION;
 };
 
 Quad ConstantHS()
 {
-	Quad output;
+    Quad output;
 
-	output.Edges[0] = 20;
-	output.Edges[1] = 20;
-	output.Edges[2] = 20;
-	output.Edges[3] = 20;
-	output.Inside[0] = 20;
-	output.Inside[1] = 20;
+    output.Edges[0] = 20;
+    output.Edges[1] = 20;
+    output.Edges[2] = 20;
+    output.Edges[3] = 20;
+    output.Inside[0] = 20;
+    output.Inside[1] = 20;
 
-	return output;
+    return output;
 }
 
 [domain("quad")]
@@ -28,11 +28,11 @@ Quad ConstantHS()
 [outputtopology("triangle_cw")]
 [outputcontrolpoints(4)]
 [patchconstantfunc("ConstantHS")]
-HullShaderOutput main(InputPatch <HullShaderOutput, 4> patch, uint i : SV_OutputControlPointID)
+HullShaderOutput main(InputPatch<HullShaderOutput, 4> patch, uint i : SV_OutputControlPointID)
 {
-	HullShaderOutput output;
+    HullShaderOutput output;
 
-	output.position = patch[i].position;
+    output.position = patch[i].position;
 
-	return output;
+    return output;
 }

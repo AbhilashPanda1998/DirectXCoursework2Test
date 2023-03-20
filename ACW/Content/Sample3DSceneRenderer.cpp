@@ -214,9 +214,9 @@ void Sample3DSceneRenderer::Render()
 	mContext->OMSetDepthStencilState(mDepthLessThanEqualAll.Get(), 0);
 
 	//Draw ray casted effects
-	DrawSpheres();
-	DrawImplicitShapes();
-	DrawImplicitPrimitives();
+	//DrawSpheres();
+	//DrawImplicitShapes();
+	//DrawImplicitPrimitives();
 	DrawFractals();
 
 	//Set linelist topology and draw snakes
