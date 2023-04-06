@@ -162,5 +162,14 @@
     <FxCompile Include="Content\SnakeVertex2.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
+    <FxCompile Include="CoralPixelShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="CoralVertexShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="CoralGeometryShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

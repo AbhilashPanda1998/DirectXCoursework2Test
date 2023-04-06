@@ -6,6 +6,8 @@
 #include <vector>
 #include "DDSTextureLoader.h"
 
+using namespace DirectX;
+
 namespace ACW
 {
 	// This sample renderer instantiates a basic rendering pipeline.
@@ -20,19 +22,31 @@ namespace ACW
 		void Render();
 
 	private:
-		void DrawSpheres();
-		void DrawImplicitShapes();
-		void DrawImplicitPrimitives();
-		void DrawFractals();
-		void DrawTerrain();
-		void DrawPlants();
-		void DrawSnakes();
-		void DrawWater();
+		void RenderSpheres();
+		void RenderImplicitShapes();
+		void RenderImplicitPrimitives();
+		
+		void CreateTerrain();
+		void RenderTerrain();
 
+		void CreatePlants();
+		void RenderPlants();
+		
+		void CreateSnakes();
+		void RenderSnakes();
+		
+		void CreateWater();
+		void RenderWater();
+		
+		void CreateCoral();
+		void RenderCoral();
+
+		void CreateCorals1();
+		void RenderCorals1();
+		
 		void CreateBuffers();
 		void SetBuffers();
 		void UpdateBuffers();
-
 		void CreateBlendStates();
 		void CreateDepthStencils();
 		void CreateRasteriserStates();
@@ -101,6 +115,13 @@ namespace ACW
 		Microsoft::WRL::ComPtr<ID3D11HullShader> mHullShaderWater;
 		Microsoft::WRL::ComPtr<ID3D11DomainShader> mDomainShaderWater;
 
+		//Coral shaders
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_CoralVertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_CoralIndexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader>	m_CoralvertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader>	m_CoralpixelShader;
+		Microsoft::WRL::ComPtr<ID3D11GeometryShader> m_CoralGeometryShader;
+
 		//Rasteriser states
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> mDefaultRasteriser;
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> mWireframeRasteriser;
@@ -132,10 +153,10 @@ namespace ACW
 		uint32 mPlantIndex;
 		uint32 mSnakeIndex;
 		bool	m_loadingComplete;
-		DirectX::XMVECTOR eye = { 0, 5, -10, 1 };
-		DirectX::XMVECTOR at = { 0.0f, 5.0f, 1.0f, 0.0f };
-		DirectX::XMVECTOR up = { 0.0f, 1.0f, 0.0f, 0.0f };
-		DirectX::XMMATRIX lookAt;
+		XMVECTOR eye = { 0, 5, -10, 1 };
+		XMVECTOR at = { 0.0f, 5.0f, 1.0f, 0.0f };
+		XMVECTOR up = { 0.0f, 1.0f, 0.0f, 0.0f };
+		XMMATRIX lookAt;
 	};
 }
 

@@ -99,6 +99,6 @@ PixelShaderInput main(Quad input, float2 UV : SV_DomainLocation, const OutputPat
 	//output.posWorld = mul(output.posWorld, model);
     output.position = mul(output.position, view);
     output.position = mul(output.position, projection);
-    output.position.y += 4.f;
+    output.position.y += 67.f;
     return output;
 }
