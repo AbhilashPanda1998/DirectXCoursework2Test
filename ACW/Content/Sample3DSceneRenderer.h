@@ -73,6 +73,8 @@ namespace ACW
 		Microsoft::WRL::ComPtr<ID3D11Buffer> fish1IndexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> fish2VertexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> fish2IndexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> fish3VertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> fish3IndexBuffer;
 
 		//Implicit shapes shaders
 		Microsoft::WRL::ComPtr<ID3D11VertexShader>	m_vertexShaderImplicitShapes;
@@ -105,6 +107,9 @@ namespace ACW
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> fish2VertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> fish2PixelShader;
 		Microsoft::WRL::ComPtr<ID3D11GeometryShader> fish2GeometryShader;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> fish3VertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> fish3PixelShader;
+		Microsoft::WRL::ComPtr<ID3D11GeometryShader> fish3GeometryShader;
 
 		//Fractal shaders
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShaderFractals;

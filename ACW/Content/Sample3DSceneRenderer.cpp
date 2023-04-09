@@ -600,6 +600,9 @@ void ACW::Sample3DSceneRenderer::CreateFishes()
 	auto loadVSTaskFish2 = DX::ReadDataAsync(L"Fish2VertexShader.cso");
 	auto loadPSTaskFish2 = DX::ReadDataAsync(L"Fish2PixelShader.cso");
 	auto loadGSTaskFish2 = DX::ReadDataAsync(L"Fish2GeometryShader.cso");
+	auto loadVSTaskFish3 = DX::ReadDataAsync(L"Fish3VertexShader.cso");
+	auto loadPSTaskFish3 = DX::ReadDataAsync(L"Fish3PixelShader.cso");
+	auto loadGSTaskFish3 = DX::ReadDataAsync(L"Fish3GeometryShader.cso");
 
 	//After the vertex shader file is loaded, create the shader
 	auto VSTask = loadVSTaskFish.then([this](const std::vector<byte>& fileData) {
@@ -705,6 +708,43 @@ void ACW::Sample3DSceneRenderer::CreateFishes()
 				fileData.size(),
 				nullptr,
 				&fish2GeometryShader
+			)
+		);
+		});
+
+
+	//After the vertex shader file is loaded, create the shader
+	auto VSTask3 = loadVSTaskFish3.then([this](const std::vector<byte>& fileData) {
+		DX::ThrowIfFailed(
+			m_deviceResources->GetD3DDevice()->CreateVertexShader(
+				&fileData[0],
+				fileData.size(),
+				nullptr,
+				&fish3VertexShader
+			)
+		);
+		});
+
+	//After the pixel shader file is loaded, create the shader
+	auto PSTask3 = loadPSTaskFish3.then([this](const std::vector<byte>& fileData) {
+		DX::ThrowIfFailed(
+			m_deviceResources->GetD3DDevice()->CreatePixelShader(
+				&fileData[0],
+				fileData.size(),
+				nullptr,
+				&fish3PixelShader
+			)
+		);
+		});
+
+	//After the geometry shader file is loaded, create the shader
+	auto GSTask3 = loadGSTaskFish3.then([this](const std::vector<byte>& fileData) {
+		DX::ThrowIfFailed(
+			m_deviceResources->GetD3DDevice()->CreateGeometryShader(
+				&fileData[0],
+				fileData.size(),
+				nullptr,
+				&fish3GeometryShader
 			)
 		);
 		});
@@ -842,9 +882,53 @@ void ACW::Sample3DSceneRenderer::CreateFishes()
 	);
 		});
 
+	auto FishTask3 = (VSTask3 && PSTask3 && GSTask3).then([this]() {
+
+	static std::vector<Vertex> fish3Vertices;
+	static std::vector<unsigned short> fish3Indices;
+
+	for (int i = 1; i < 3; i++)
+	{
+		fish3Vertices.emplace_back(Vertex{ XMFLOAT3((float)i + 2, 0, (float)i) });
+	}
+
+	for (int i = 0; i < fish3Vertices.size(); i++)
+	{
+		fish3Indices.push_back(i);
+	}
+
+	D3D11_SUBRESOURCE_DATA vertexBufferData = { 0 };
+	vertexBufferData.pSysMem = &(fish3Vertices[0]);
+	vertexBufferData.SysMemPitch = 0;
+	vertexBufferData.SysMemSlicePitch = 0;
+	CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(Vertex) * fish3Vertices.size(), D3D11_BIND_VERTEX_BUFFER);
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateBuffer(
+			&vertexBufferDesc,
+			&vertexBufferData,
+			&fish3VertexBuffer
+		)
+	);
+
+	fishIndex = fish3Indices.size();
+
+	D3D11_SUBRESOURCE_DATA indexBufferData = { 0 };
+	indexBufferData.pSysMem = &(fish3Indices[0]);
+	indexBufferData.SysMemPitch = 0;
+	indexBufferData.SysMemSlicePitch = 0;
+	CD3D11_BUFFER_DESC indexBufferDesc(sizeof(unsigned short) * fish3Indices.size(), D3D11_BIND_INDEX_BUFFER);
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateBuffer(
+			&indexBufferDesc,
+			&indexBufferData,
+			&fish3IndexBuffer
+		)
+	);
+		});
+
 
 	//Once all vertices are loaded, set buffers and set loading complete to true
-	auto complete = (FishTasks && FishTask1 && FishTask2).then([this]() {
+	auto complete = (FishTasks && FishTask1 && FishTask2 && FishTask3).then([this]() {
 		SetBuffers();
 	m_loadingComplete = true;
 		});
@@ -983,6 +1067,53 @@ void ACW::Sample3DSceneRenderer::RenderFishes()
 	// Attach our geometry shader.
 	mContext->GSSetShader(
 		fish2GeometryShader.Get(),
+		nullptr,
+		0
+	);
+
+	// Draw the objects.
+	mContext->DrawIndexed(
+		fishIndex,
+		0,
+		0
+	);
+#pragma endregion
+
+#pragma region Fish3
+	// Each vertex is one instance of the Vertex struct.
+	stride = sizeof(Vertex);
+	offset = 0;
+	mContext->IASetVertexBuffers(
+		0,
+		1,
+		fish3VertexBuffer.GetAddressOf(),
+		&stride,
+		&offset
+	);
+
+	mContext->IASetIndexBuffer(
+		fish3IndexBuffer.Get(),
+		DXGI_FORMAT_R16_UINT, // Each index is one 16-bit unsigned integer (short).
+		0
+	);
+
+	// Attach our vertex shader.
+	mContext->VSSetShader(
+		fish3VertexShader.Get(),
+		nullptr,
+		0
+	);
+
+	// Attach our pixel shader.
+	mContext->PSSetShader(
+		fish3PixelShader.Get(),
+		nullptr,
+		0
+	);
+
+	// Attach our geometry shader.
+	mContext->GSSetShader(
+		fish3GeometryShader.Get(),
 		nullptr,
 		0
 	);

@@ -14,6 +14,12 @@ struct VertexShaderInput
     float3 pos : POSITION;
 };
 
+cbuffer timeConstantBuffer : register(b1)
+{
+    float time;
+    float3 padding;
+}
+
 struct HullShaderInput
 {
     float4 position : SV_POSITION;
