@@ -58,6 +58,7 @@ void main(point GeometryShaderInput input[1], inout TriangleStream<PixelShaderIn
 		output.position = vPos + float4(quadSize * QuadPos[1], 0.0);
 		output.position = mul(output.position, projection);
 		output.uv = ((QuadPos[1].xy * -1) + float2(1, 1)) / 2;
+
 		OutputStream.Append(output);
 
 		//Vertex 3

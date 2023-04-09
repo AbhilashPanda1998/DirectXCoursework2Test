@@ -29,11 +29,11 @@ namespace ACW
 		void CreateTerrain();
 		void RenderTerrain();
 
-		void CreatePlants();
-		void RenderPlants();
+		void CreateSeaWeeds();
+		void RenderSeaWeeds();
 		
-		void CreateSnakes();
-		void RenderSnakes();
+		void CreateFishes();
+		void RenderFishes();
 		
 		void CreateWater();
 		void RenderWater();
@@ -64,15 +64,15 @@ namespace ACW
 		Microsoft::WRL::ComPtr<ID3D11Buffer>		m_vertexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer>		m_indexBuffer;
 
-		//Plant vertices/indices
-		Microsoft::WRL::ComPtr<ID3D11Buffer> mPlantVertexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> mPlantIndexBuffer;
-
-		//Snake vertices/indices
-		Microsoft::WRL::ComPtr<ID3D11Buffer> mSnakeVertexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> mSnakeIndexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> mSnakeVertexBuffer2;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> mSnakeIndexBuffer2;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> seaWeedsVertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> seaWeedsIndexBuffer;
+		
+		Microsoft::WRL::ComPtr<ID3D11Buffer> fishVertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> fishIndexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> fish1VertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> fish1IndexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> fish2VertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> fish2IndexBuffer;
 
 		//Implicit shapes shaders
 		Microsoft::WRL::ComPtr<ID3D11VertexShader>	m_vertexShaderImplicitShapes;
@@ -92,18 +92,19 @@ namespace ACW
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShaderSpheres;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> mPixelShaderSpheres;
 
-		//Plant shaders
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShaderPlants;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> mPixelShaderPlants;
-		Microsoft::WRL::ComPtr<ID3D11GeometryShader> mGeometryShaderPlants;
-
-		//Snake shaders
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShaderSnakes;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> mPixelShaderSnakes;
-		Microsoft::WRL::ComPtr<ID3D11GeometryShader> mGeometryShaderSnakes;
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShaderSnakes2;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> mPixelShaderSnakes2;
-		Microsoft::WRL::ComPtr<ID3D11GeometryShader> mGeometryShaderSnakes2;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> seaWeedsVertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> seaWeedsPixelShader;
+		Microsoft::WRL::ComPtr<ID3D11GeometryShader> seaWeedsGeometryShader;
+ 
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> fishVertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> fishPixelShader;
+		Microsoft::WRL::ComPtr<ID3D11GeometryShader> fishGeometryShader;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> fish1VertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> fish1PixelShader;
+		Microsoft::WRL::ComPtr<ID3D11GeometryShader> fish1GeometryShader;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> fish2VertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> fish2PixelShader;
+		Microsoft::WRL::ComPtr<ID3D11GeometryShader> fish2GeometryShader;
 
 		//Fractal shaders
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShaderFractals;
@@ -118,8 +119,8 @@ namespace ACW
 		//Coral shaders
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_CoralVertexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_CoralIndexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11VertexShader>	m_CoralvertexShader;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader>	m_CoralpixelShader;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_CoralvertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_CoralpixelShader;
 		Microsoft::WRL::ComPtr<ID3D11GeometryShader> m_CoralGeometryShader;
 
 		//Rasteriser states
@@ -127,7 +128,7 @@ namespace ACW
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> mWireframeRasteriser;
 
 		//Texture/Sampler
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mPlantTexture;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> seaWeedsTexture;
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> mSampler;
 
 		//Blend states
@@ -150,8 +151,8 @@ namespace ACW
 
 		//Variables
 		uint32	m_indexCount;
-		uint32 mPlantIndex;
-		uint32 mSnakeIndex;
+		uint32 seaWeedsIndex;
+		uint32 fishIndex;
 		bool	m_loadingComplete;
 		XMVECTOR eye = { 0, 5, -10, 1 };
 		XMVECTOR at = { 0.0f, 5.0f, 1.0f, 0.0f };

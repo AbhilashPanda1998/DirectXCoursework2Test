@@ -77,7 +77,7 @@
     <Image Include="Assets\StoreLogo.png">
       <Filter>Assets</Filter>
     </Image>
-    <Image Include="grass.dds" />
+    <Image Include="seaweeds.dds" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest" />
@@ -111,13 +111,13 @@
     <FxCompile Include="Content\ShinySphereRayTracerVertex.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
-    <FxCompile Include="Content\PlantGeometry.hlsl">
+    <FxCompile Include="Content\SeaWeedsGeometryShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
-    <FxCompile Include="Content\PlantPixel.hlsl">
+    <FxCompile Include="Content\SeaWeedsPixelShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
-    <FxCompile Include="Content\PlantVertex.hlsl">
+    <FxCompile Include="Content\SeaWeedsVertexShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
     <FxCompile Include="Content\WaterDomain.hlsl">
@@ -144,22 +144,22 @@
     <FxCompile Include="Content\FractalsVertex.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
-    <FxCompile Include="Content\SnakeGeometry.hlsl">
+    <FxCompile Include="Content\FishGeometryShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
-    <FxCompile Include="Content\SnakePixel.hlsl">
+    <FxCompile Include="Content\FishPixelShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
-    <FxCompile Include="Content\SnakeVertex.hlsl">
+    <FxCompile Include="Content\FishVertexShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
-    <FxCompile Include="Content\SnakeGeometry2.hlsl">
+    <FxCompile Include="Content\Fish1GeometryShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
-    <FxCompile Include="Content\SnakePixel2.hlsl">
+    <FxCompile Include="Content\Fish1PixelShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
-    <FxCompile Include="Content\SnakeVertex2.hlsl">
+    <FxCompile Include="Content\Fish1VertexShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
     <FxCompile Include="CoralPixelShader.hlsl">
@@ -169,6 +169,15 @@
       <Filter>Content</Filter>
     </FxCompile>
     <FxCompile Include="CoralGeometryShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="Fish2GeometryShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="Fish2PixelShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="Fish2VertexShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
   </ItemGroup>

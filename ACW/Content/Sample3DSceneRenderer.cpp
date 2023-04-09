@@ -209,13 +209,13 @@ void Sample3DSceneRenderer::Render()
 	//RenderImplicitPrimitives();
 	//RenderCorals1();
 
-	RenderSnakes();
+	RenderFishes();
 
 	mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST);
 	RenderTerrain();
 	RenderWater();
 	
-	RenderPlants();
+	RenderSeaWeeds();
 	RenderCoral();
 }
 
@@ -416,108 +416,106 @@ void ACW::Sample3DSceneRenderer::RenderTerrain()
 	);
 }
 
-void ACW::Sample3DSceneRenderer::CreatePlants()
+void ACW::Sample3DSceneRenderer::CreateSeaWeeds()
 {
-	//Plants shaders
-	auto loadVSTaskPlants = DX::ReadDataAsync(L"PlantVertex.cso");
-	auto loadPSTaskPlants = DX::ReadDataAsync(L"PlantPixel.cso");
-	auto loadGSTaskPlants = DX::ReadDataAsync(L"PlantGeometry.cso");
+	auto VSTaskWeeds = DX::ReadDataAsync(L"SeaWeedsVertexShader.cso");
+	auto PSTaskWeeds = DX::ReadDataAsync(L"SeaWeedsPixelShader.cso");
+	auto GSTaskWeeds = DX::ReadDataAsync(L"SeaWeedsGeometryShader.cso");
 
 	//After the vertex shader file is loaded, create the shader
-	auto PlantsVSTask = loadVSTaskPlants.then([this](const std::vector<byte>& fileData) {
+	auto VSTask = VSTaskWeeds.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreateVertexShader(
 				&fileData[0],
 				fileData.size(),
 				nullptr,
-				&mVertexShaderPlants
+				&seaWeedsVertexShader
 			)
 		);
 		});
 
-	//Load plant texture from file
-	auto hr = CreateDDSTextureFromFile(m_deviceResources->GetD3DDevice(), L"grass.dds", nullptr, mPlantTexture.GetAddressOf());
+	
+	auto hr = CreateDDSTextureFromFile(m_deviceResources->GetD3DDevice(), L"seaweeds.dds", nullptr, seaWeedsTexture.GetAddressOf());
 
 	//After the pixel shader file is loaded, create the shader
-	auto PlantsPSTask = loadPSTaskPlants.then([this](const std::vector<byte>& fileData) {
+	auto PSTask = PSTaskWeeds.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreatePixelShader(
 				&fileData[0],
 				fileData.size(),
 				nullptr,
-				&mPixelShaderPlants
+				&seaWeedsPixelShader
 			)
 		);
 		});
 
 	//After the geometry shader file is loaded, create the shader
-	auto PlantsGSTask = loadGSTaskPlants.then([this](const std::vector<byte>& fileData) {
+	auto GSTask = GSTaskWeeds.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreateGeometryShader(
 				&fileData[0],
 				fileData.size(),
 				nullptr,
-				&mGeometryShaderPlants
+				&seaWeedsGeometryShader
 			)
 		);
 		});
 
-	//Once the shaders using the plant vertices are loaded, load the plant vertices
-	auto createPlantsTask = (PlantsVSTask && PlantsPSTask && PlantsGSTask).then([this]() {
+	auto SeaWeedsTask = (VSTask && PSTask && GSTask).then([this]() {
 
-		static std::vector<Vertex> plantVertices;
-	static std::vector<unsigned short> plantIndices;
+	static std::vector<Vertex> seaWeedsVertices;
+	static std::vector<unsigned short> seaWeedsIndices;
 
-	for (int i = -10; i < 11; i++)
+	for (int i = -30; i < 30; i++)
 	{
-		for (int j = -10; j < 11; j++)
+		for (int j = -30; j < 30; j++)
 		{
-			plantVertices.emplace_back(Vertex{ XMFLOAT3(i, 0, j) });
+			seaWeedsVertices.emplace_back(Vertex{ XMFLOAT3(i, 0, j) });
 		}
 	}
 
-	for (int i = 0; i < plantVertices.size(); i++)
+	for (int i = 0; i < seaWeedsVertices.size(); i++)
 	{
-		plantIndices.push_back(i);
+		seaWeedsIndices.push_back(i);
 	}
 
 	D3D11_SUBRESOURCE_DATA vertexBufferData = { 0 };
-	vertexBufferData.pSysMem = &(plantVertices[0]);
+	vertexBufferData.pSysMem = &(seaWeedsVertices[0]);
 	vertexBufferData.SysMemPitch = 0;
 	vertexBufferData.SysMemSlicePitch = 0;
-	CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(Vertex) * plantVertices.size(), D3D11_BIND_VERTEX_BUFFER);
+	CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(Vertex) * seaWeedsVertices.size(), D3D11_BIND_VERTEX_BUFFER);
 	DX::ThrowIfFailed(
 		m_deviceResources->GetD3DDevice()->CreateBuffer(
 			&vertexBufferDesc,
 			&vertexBufferData,
-			&mPlantVertexBuffer
+			&seaWeedsVertexBuffer
 		)
 	);
 
-	mPlantIndex = plantIndices.size();
+	seaWeedsIndex = seaWeedsIndices.size();
 
 	D3D11_SUBRESOURCE_DATA indexBufferData = { 0 };
-	indexBufferData.pSysMem = &(plantIndices[0]);
+	indexBufferData.pSysMem = &(seaWeedsIndices[0]);
 	indexBufferData.SysMemPitch = 0;
 	indexBufferData.SysMemSlicePitch = 0;
-	CD3D11_BUFFER_DESC indexBufferDesc(sizeof(unsigned short) * plantIndices.size(), D3D11_BIND_INDEX_BUFFER);
+	CD3D11_BUFFER_DESC indexBufferDesc(sizeof(unsigned short) * seaWeedsIndices.size(), D3D11_BIND_INDEX_BUFFER);
 	DX::ThrowIfFailed(
 		m_deviceResources->GetD3DDevice()->CreateBuffer(
 			&indexBufferDesc,
 			&indexBufferData,
-			&mPlantIndexBuffer
+			&seaWeedsIndexBuffer
 		)
 	);
 		});
 
 
-	auto complete = (createPlantsTask).then([this]() {
+	auto complete = (SeaWeedsTask).then([this]() {
 		SetBuffers();
 	m_loadingComplete = true;
 		});
 }
 
-void ACW::Sample3DSceneRenderer::RenderPlants()
+void ACW::Sample3DSceneRenderer::RenderSeaWeeds()
 {
 	mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
@@ -527,32 +525,32 @@ void ACW::Sample3DSceneRenderer::RenderPlants()
 	mContext->IASetVertexBuffers(
 		0,
 		1,
-		mPlantVertexBuffer.GetAddressOf(),
+		seaWeedsVertexBuffer.GetAddressOf(),
 		&stride,
 		&offset
 	);
 
 	mContext->IASetIndexBuffer(
-		mPlantIndexBuffer.Get(),
+		seaWeedsIndexBuffer.Get(),
 		DXGI_FORMAT_R16_UINT, // Each index is one 16-bit unsigned integer (short).
 		0
 	);
 
 	// Attach our vertex shader.
 	mContext->VSSetShader(
-		mVertexShaderPlants.Get(),
+		seaWeedsVertexShader.Get(),
 		nullptr,
 		0
 	);
 
 	// Attach our pixel shader.
 	mContext->PSSetShader(
-		mPixelShaderPlants.Get(),
+		seaWeedsPixelShader.Get(),
 		nullptr,
 		0
 	);
 
-	mContext->PSSetShaderResources(0, 1, mPlantTexture.GetAddressOf());
+	mContext->PSSetShaderResources(0, 1, seaWeedsTexture.GetAddressOf());
 
 	mContext->PSSetSamplers(0, 1, mSampler.GetAddressOf());
 
@@ -564,7 +562,7 @@ void ACW::Sample3DSceneRenderer::RenderPlants()
 
 	// Attach our geometry shader.
 	mContext->GSSetShader(
-		mGeometryShaderPlants.Get(),
+		seaWeedsGeometryShader.Get(),
 		nullptr,
 		0
 	);
@@ -585,285 +583,413 @@ void ACW::Sample3DSceneRenderer::RenderPlants()
 
 	// Draw the objects.
 	mContext->DrawIndexed(
-		mPlantIndex,
+		seaWeedsIndex,
 		0,
 		0
 	);
 }
 
-void ACW::Sample3DSceneRenderer::CreateSnakes()
+void ACW::Sample3DSceneRenderer::CreateFishes()
 {
-	//Snakes shaders
-	auto loadVSTaskSnakes = DX::ReadDataAsync(L"SnakeVertex.cso");
-	auto loadPSTaskSnakes = DX::ReadDataAsync(L"SnakePixel.cso");
-	auto loadGSTaskSnakes = DX::ReadDataAsync(L"SnakeGeometry.cso");
-	auto loadVSTaskSnakes2 = DX::ReadDataAsync(L"SnakeVertex2.cso");
-	auto loadPSTaskSnakes2 = DX::ReadDataAsync(L"SnakePixel2.cso");
-	auto loadGSTaskSnakes2 = DX::ReadDataAsync(L"SnakeGeometry2.cso");
+	auto loadVSTaskFish = DX::ReadDataAsync(L"FishVertexShader.cso");
+	auto loadPSTaskFish = DX::ReadDataAsync(L"FishPixelShader.cso");
+	auto loadGSTaskFish = DX::ReadDataAsync(L"FishGeometryShader.cso");
+	auto loadVSTaskFish1 = DX::ReadDataAsync(L"Fish1VertexShader.cso");
+	auto loadPSTaskFish1 = DX::ReadDataAsync(L"Fish1PixelShader.cso");
+	auto loadGSTaskFish1 = DX::ReadDataAsync(L"Fish1GeometryShader.cso");
+	auto loadVSTaskFish2 = DX::ReadDataAsync(L"Fish2VertexShader.cso");
+	auto loadPSTaskFish2 = DX::ReadDataAsync(L"Fish2PixelShader.cso");
+	auto loadGSTaskFish2 = DX::ReadDataAsync(L"Fish2GeometryShader.cso");
 
 	//After the vertex shader file is loaded, create the shader
-	auto SnakesVSTask = loadVSTaskSnakes.then([this](const std::vector<byte>& fileData) {
+	auto VSTask = loadVSTaskFish.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreateVertexShader(
 				&fileData[0],
 				fileData.size(),
 				nullptr,
-				&mVertexShaderSnakes
+				&fishVertexShader
 			)
 		);
 		});
 
 	//After the pixel shader file is loaded, create the shader
-	auto SnakesPSTask = loadPSTaskSnakes.then([this](const std::vector<byte>& fileData) {
+	auto PSTask = loadPSTaskFish.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreatePixelShader(
 				&fileData[0],
 				fileData.size(),
 				nullptr,
-				&mPixelShaderSnakes
+				&fishPixelShader
 			)
 		);
 		});
 
 	//After the geometry shader file is loaded, create the shader
-	auto SnakesGSTask = loadGSTaskSnakes.then([this](const std::vector<byte>& fileData) {
+	auto GSTask = loadGSTaskFish.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreateGeometryShader(
 				&fileData[0],
 				fileData.size(),
 				nullptr,
-				&mGeometryShaderSnakes
+				&fishGeometryShader
 			)
 		);
 		});
 
 	//After the vertex shader file is loaded, create the shader
-	auto SnakesVSTask2 = loadVSTaskSnakes2.then([this](const std::vector<byte>& fileData) {
+	auto VSTask1 = loadVSTaskFish1.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreateVertexShader(
 				&fileData[0],
 				fileData.size(),
 				nullptr,
-				&mVertexShaderSnakes2
+				&fish1VertexShader
 			)
 		);
 		});
 
 	//After the pixel shader file is loaded, create the shader
-	auto SnakesPSTask2 = loadPSTaskSnakes2.then([this](const std::vector<byte>& fileData) {
+	auto PSTask1 = loadPSTaskFish1.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreatePixelShader(
 				&fileData[0],
 				fileData.size(),
 				nullptr,
-				&mPixelShaderSnakes2
+				&fish1PixelShader
 			)
 		);
 		});
 
 	//After the geometry shader file is loaded, create the shader
-	auto SnakesGSTask2 = loadGSTaskSnakes2.then([this](const std::vector<byte>& fileData) {
+	auto GSTask1 = loadGSTaskFish1.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreateGeometryShader(
 				&fileData[0],
 				fileData.size(),
 				nullptr,
-				&mGeometryShaderSnakes2
+				&fish1GeometryShader
+			)
+		);
+		});
+
+	//After the vertex shader file is loaded, create the shader
+	auto VSTask2 = loadVSTaskFish2.then([this](const std::vector<byte>& fileData) {
+		DX::ThrowIfFailed(
+			m_deviceResources->GetD3DDevice()->CreateVertexShader(
+				&fileData[0],
+				fileData.size(),
+				nullptr,
+				&fish2VertexShader
+			)
+		);
+		});
+
+	//After the pixel shader file is loaded, create the shader
+	auto PSTask2 = loadPSTaskFish2.then([this](const std::vector<byte>& fileData) {
+		DX::ThrowIfFailed(
+			m_deviceResources->GetD3DDevice()->CreatePixelShader(
+				&fileData[0],
+				fileData.size(),
+				nullptr,
+				&fish2PixelShader
+			)
+		);
+		});
+
+	//After the geometry shader file is loaded, create the shader
+	auto GSTask2 = loadGSTaskFish2.then([this](const std::vector<byte>& fileData) {
+		DX::ThrowIfFailed(
+			m_deviceResources->GetD3DDevice()->CreateGeometryShader(
+				&fileData[0],
+				fileData.size(),
+				nullptr,
+				&fish2GeometryShader
 			)
 		);
 		});
 
 
-	//Once the shaders using the snake vertices are loaded, load the snake vertices
-	auto createSnakesTask = (SnakesVSTask && SnakesPSTask && SnakesGSTask).then([this]() {
+	auto FishTasks = (VSTask && PSTask && GSTask).then([this]() {
 
-		static std::vector<Vertex> snakeVertices;
-	static std::vector<unsigned short> snakeIndices;
+	static std::vector<Vertex> fishVertices;
+	static std::vector<unsigned short> fishIndices;
 
-	for (int i = 1; i < 10; i++)
+	for (int i = 1; i < 3; i++)
 	{
-		snakeVertices.emplace_back(Vertex{ XMFLOAT3((float)i - 0.5, 0, 0) });
+		fishVertices.emplace_back(Vertex{ XMFLOAT3((float)i - 0.2, 0, 0) });
 	}
 
-	for (int i = 0; i < snakeVertices.size(); i++)
+	for (int i = 0; i < fishVertices.size(); i++)
 	{
-		snakeIndices.push_back(i);
+		fishIndices.push_back(i);
 	}
 
 	D3D11_SUBRESOURCE_DATA vertexBufferData = { 0 };
-	vertexBufferData.pSysMem = &(snakeVertices[0]);
+	vertexBufferData.pSysMem = &(fishVertices[0]);
 	vertexBufferData.SysMemPitch = 0;
 	vertexBufferData.SysMemSlicePitch = 0;
-	CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(Vertex) * snakeVertices.size(), D3D11_BIND_VERTEX_BUFFER);
+	CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(Vertex) * fishVertices.size(), D3D11_BIND_VERTEX_BUFFER);
 	DX::ThrowIfFailed(
 		m_deviceResources->GetD3DDevice()->CreateBuffer(
 			&vertexBufferDesc,
 			&vertexBufferData,
-			&mSnakeVertexBuffer
+			&fishVertexBuffer
 		)
 	);
 
-	mSnakeIndex = snakeIndices.size();
+	fishIndex = fishIndices.size();
 
 	D3D11_SUBRESOURCE_DATA indexBufferData = { 0 };
-	indexBufferData.pSysMem = &(snakeIndices[0]);
+	indexBufferData.pSysMem = &(fishIndices[0]);
 	indexBufferData.SysMemPitch = 0;
 	indexBufferData.SysMemSlicePitch = 0;
-	CD3D11_BUFFER_DESC indexBufferDesc(sizeof(unsigned short) * snakeIndices.size(), D3D11_BIND_INDEX_BUFFER);
+	CD3D11_BUFFER_DESC indexBufferDesc(sizeof(unsigned short) * fishIndices.size(), D3D11_BIND_INDEX_BUFFER);
 	DX::ThrowIfFailed(
 		m_deviceResources->GetD3DDevice()->CreateBuffer(
 			&indexBufferDesc,
 			&indexBufferData,
-			&mSnakeIndexBuffer
+			&fishIndexBuffer
 		)
 	);
 		});
 
-	//Once the shaders using the snake vertices are loaded, load the snake vertices
-	auto createSnakesTask2 = (SnakesVSTask2 && SnakesPSTask2 && SnakesGSTask2).then([this]() {
+	auto FishTask1 = (VSTask1 && PSTask1 && GSTask1).then([this]() {
 
-		static std::vector<Vertex> snakeVertices;
-	static std::vector<unsigned short> snakeIndices;
+	static std::vector<Vertex> fish1Vertices;
+	static std::vector<unsigned short> fish1Indices;
 
 	for (int i = 1; i < 10; i++)
 	{
-		snakeVertices.emplace_back(Vertex{ XMFLOAT3(0, 0, (float)i - 0.5) });
+		fish1Vertices.emplace_back(Vertex{ XMFLOAT3(0, 0, (float)i - 0.5) });
 	}
 
-	for (int i = 0; i < snakeVertices.size(); i++)
+	for (int i = 0; i < fish1Vertices.size(); i++)
 	{
-		snakeIndices.push_back(i);
+		fish1Indices.push_back(i);
 	}
 
 	D3D11_SUBRESOURCE_DATA vertexBufferData = { 0 };
-	vertexBufferData.pSysMem = &(snakeVertices[0]);
+	vertexBufferData.pSysMem = &(fish1Vertices[0]);
 	vertexBufferData.SysMemPitch = 0;
 	vertexBufferData.SysMemSlicePitch = 0;
-	CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(Vertex) * snakeVertices.size(), D3D11_BIND_VERTEX_BUFFER);
+	CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(Vertex) * fish1Vertices.size(), D3D11_BIND_VERTEX_BUFFER);
 	DX::ThrowIfFailed(
 		m_deviceResources->GetD3DDevice()->CreateBuffer(
 			&vertexBufferDesc,
 			&vertexBufferData,
-			&mSnakeVertexBuffer2
+			&fish1VertexBuffer
 		)
 	);
 
-	mSnakeIndex = snakeIndices.size();
+	fishIndex = fish1Indices.size();
 
 	D3D11_SUBRESOURCE_DATA indexBufferData = { 0 };
-	indexBufferData.pSysMem = &(snakeIndices[0]);
+	indexBufferData.pSysMem = &(fish1Indices[0]);
 	indexBufferData.SysMemPitch = 0;
 	indexBufferData.SysMemSlicePitch = 0;
-	CD3D11_BUFFER_DESC indexBufferDesc(sizeof(unsigned short) * snakeIndices.size(), D3D11_BIND_INDEX_BUFFER);
+	CD3D11_BUFFER_DESC indexBufferDesc(sizeof(unsigned short) * fish1Indices.size(), D3D11_BIND_INDEX_BUFFER);
 	DX::ThrowIfFailed(
 		m_deviceResources->GetD3DDevice()->CreateBuffer(
 			&indexBufferDesc,
 			&indexBufferData,
-			&mSnakeIndexBuffer2
+			&fish1IndexBuffer
 		)
 	);
 		});
+
+	auto FishTask2 = (VSTask2 && PSTask2 && GSTask2).then([this]() {
+
+		static std::vector<Vertex> fish2Vertices;
+	static std::vector<unsigned short> fish2Indices;
+
+	for (int i = 1; i < 3; i++)
+	{
+		fish2Vertices.emplace_back(Vertex{ XMFLOAT3((float)i + 2, 0, (float)i) });
+	}
+
+	for (int i = 0; i < fish2Vertices.size(); i++)
+	{
+		fish2Indices.push_back(i);
+	}
+
+	D3D11_SUBRESOURCE_DATA vertexBufferData = { 0 };
+	vertexBufferData.pSysMem = &(fish2Vertices[0]);
+	vertexBufferData.SysMemPitch = 0;
+	vertexBufferData.SysMemSlicePitch = 0;
+	CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(Vertex) * fish2Vertices.size(), D3D11_BIND_VERTEX_BUFFER);
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateBuffer(
+			&vertexBufferDesc,
+			&vertexBufferData,
+			&fish2VertexBuffer
+		)
+	);
+
+	fishIndex = fish2Indices.size();
+
+	D3D11_SUBRESOURCE_DATA indexBufferData = { 0 };
+	indexBufferData.pSysMem = &(fish2Indices[0]);
+	indexBufferData.SysMemPitch = 0;
+	indexBufferData.SysMemSlicePitch = 0;
+	CD3D11_BUFFER_DESC indexBufferDesc(sizeof(unsigned short) * fish2Indices.size(), D3D11_BIND_INDEX_BUFFER);
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateBuffer(
+			&indexBufferDesc,
+			&indexBufferData,
+			&fish2IndexBuffer
+		)
+	);
+		});
+
 
 	//Once all vertices are loaded, set buffers and set loading complete to true
-	auto complete = (createSnakesTask && createSnakesTask2).then([this]() {
+	auto complete = (FishTasks && FishTask1 && FishTask2).then([this]() {
 		SetBuffers();
 	m_loadingComplete = true;
 		});
 }
 
-void ACW::Sample3DSceneRenderer::RenderSnakes()
+void ACW::Sample3DSceneRenderer::RenderFishes()
 {
 	mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
-#pragma region Snake 1
+#pragma region Fish
 	// Each vertex is one instance of the Vertex struct.
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 	mContext->IASetVertexBuffers(
 		0,
 		1,
-		mSnakeVertexBuffer.GetAddressOf(),
+		fish1VertexBuffer.GetAddressOf(),
 		&stride,
 		&offset
 	);
 
 	mContext->IASetIndexBuffer(
-		mSnakeIndexBuffer.Get(),
+		fishIndexBuffer.Get(),
 		DXGI_FORMAT_R16_UINT, // Each index is one 16-bit unsigned integer (short).
 		0
 	);
 
 	// Attach our vertex shader.
 	mContext->VSSetShader(
-		mVertexShaderSnakes.Get(),
+		fishVertexShader.Get(),
 		nullptr,
 		0
 	);
 
 	// Attach our pixel shader.
 	mContext->PSSetShader(
-		mPixelShaderSnakes.Get(),
+		fishPixelShader.Get(),
 		nullptr,
 		0
 	);
 
 	// Attach our geometry shader.
 	mContext->GSSetShader(
-		mGeometryShaderSnakes.Get(),
+		fishGeometryShader.Get(),
 		nullptr,
 		0
 	);
 
 	// Draw the objects.
 	mContext->DrawIndexed(
-		mSnakeIndex,
+		fishIndex,
 		0,
 		0
 	);
 #pragma endregion
 
-#pragma region Snake2
+#pragma region Fish1
 	// Each vertex is one instance of the Vertex struct.
 	stride = sizeof(Vertex);
 	offset = 0;
 	mContext->IASetVertexBuffers(
 		0,
 		1,
-		mSnakeVertexBuffer2.GetAddressOf(),
+		fish1VertexBuffer.GetAddressOf(),
 		&stride,
 		&offset
 	);
 
 	mContext->IASetIndexBuffer(
-		mSnakeIndexBuffer2.Get(),
+		fish1IndexBuffer.Get(),
 		DXGI_FORMAT_R16_UINT, // Each index is one 16-bit unsigned integer (short).
 		0
 	);
 
 	// Attach our vertex shader.
 	mContext->VSSetShader(
-		mVertexShaderSnakes2.Get(),
+		fish1VertexShader.Get(),
 		nullptr,
 		0
 	);
 
 	// Attach our pixel shader.
 	mContext->PSSetShader(
-		mPixelShaderSnakes2.Get(),
+		fish1PixelShader.Get(),
 		nullptr,
 		0
 	);
 
 	// Attach our geometry shader.
 	mContext->GSSetShader(
-		mGeometryShaderSnakes2.Get(),
+		fish1GeometryShader.Get(),
 		nullptr,
 		0
 	);
 
 	// Draw the objects.
 	mContext->DrawIndexed(
-		mSnakeIndex,
+		fishIndex,
+		0,
+		0
+	);
+#pragma endregion
+
+#pragma region Fish2
+	// Each vertex is one instance of the Vertex struct.
+	stride = sizeof(Vertex);
+	offset = 0;
+	mContext->IASetVertexBuffers(
+		0,
+		1,
+		fish2VertexBuffer.GetAddressOf(),
+		&stride,
+		&offset
+	);
+
+	mContext->IASetIndexBuffer(
+		fish2IndexBuffer.Get(),
+		DXGI_FORMAT_R16_UINT, // Each index is one 16-bit unsigned integer (short).
+		0
+	);
+
+	// Attach our vertex shader.
+	mContext->VSSetShader(
+		fish2VertexShader.Get(),
+		nullptr,
+		0
+	);
+
+	// Attach our pixel shader.
+	mContext->PSSetShader(
+		fish2PixelShader.Get(),
+		nullptr,
+		0
+	);
+
+	// Attach our geometry shader.
+	mContext->GSSetShader(
+		fish2GeometryShader.Get(),
+		nullptr,
+		0
+	);
+
+	// Draw the objects.
+	mContext->DrawIndexed(
+		fishIndex,
 		0,
 		0
 	);
@@ -968,11 +1094,11 @@ void ACW::Sample3DSceneRenderer::RenderWater()
 void ACW::Sample3DSceneRenderer::CreateCoral()
 {
 	// Load shaders asynchronously.
-	auto loadVSTask = DX::ReadDataAsync(L"CoralVertexShader.cso");
-	auto loadPSTask = DX::ReadDataAsync(L"CoralPixelShader.cso");
-	auto loadGSTask = DX::ReadDataAsync(L"CoralGeometryShader.cso");
+	auto VSTask = DX::ReadDataAsync(L"CoralVertexShader.cso");
+	auto PSTask = DX::ReadDataAsync(L"CoralPixelShader.cso");
+	auto GSTask = DX::ReadDataAsync(L"CoralGeometryShader.cso");
 	// After the vertex shader file is loaded, create the shader and input layout.
-	auto createVSTask = loadVSTask.then([this](const std::vector<byte>& fileData) {
+	auto createVSTask = VSTask.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreateVertexShader(
 				&fileData[0],
@@ -1000,7 +1126,7 @@ void ACW::Sample3DSceneRenderer::CreateCoral()
 		});
 
 	// After the pixel shader file is loaded, create the shader and constant buffer.
-	auto createPSTask = loadPSTask.then([this](const std::vector<byte>& fileData) {
+	auto createPSTask = PSTask.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreatePixelShader(
 				&fileData[0],
@@ -1022,7 +1148,7 @@ void ACW::Sample3DSceneRenderer::CreateCoral()
 
 
 
-	auto createGSTask = loadGSTask.then([this](const std::vector<byte>&
+	auto createGSTask = GSTask.then([this](const std::vector<byte>&
 		fileData) {
 			DX::ThrowIfFailed(
 				m_deviceResources->GetD3DDevice()->CreateGeometryShader(
@@ -1663,8 +1789,8 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 	//CreateCorals1();
 	CreateTerrain();
 	CreateWater();
-	CreateSnakes();
-	CreatePlants();
+	CreateFishes();
+	CreateSeaWeeds();
 }
 
 void Sample3DSceneRenderer::ReleaseDeviceDependentResources()

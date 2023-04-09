@@ -63,9 +63,10 @@ GeometryShaderInput main(VertexShaderInput input)
 {
 	GeometryShaderInput output;
 
-	output.position = float4(input.pos.x - 20, input.pos.y , input.pos.z, 1);
-	output.position.x += time * 0.4;
+	output.position = float4(input.pos.x, input.pos.y , input.pos.z, 1);
+	output.position.z += time * 0.4;
 	output.position.y = fractalNoise(output.position.xz) + 0.1;
-
+    output.position.y += 5;
+	
 	return output;
 }
