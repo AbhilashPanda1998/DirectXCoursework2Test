@@ -41,6 +41,9 @@ namespace ACW
 		void CreateCoral();
 		void RenderCoral();
 
+		void CreateStarfish();
+		void RenderStarfish();
+
 		void CreateCorals1();
 		void RenderCorals1();
 		
@@ -127,6 +130,13 @@ namespace ACW
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_CoralvertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_CoralpixelShader;
 		Microsoft::WRL::ComPtr<ID3D11GeometryShader> m_CoralGeometryShader;
+
+		//Starfish shaders
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_StarfishVertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_StarfishIndexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_StarfishVertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_StarfishPixelShader;
+		Microsoft::WRL::ComPtr<ID3D11GeometryShader> m_StarfishGeometryShader;
 
 		//Rasteriser states
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> mDefaultRasteriser;

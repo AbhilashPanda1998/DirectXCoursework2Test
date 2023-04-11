@@ -189,5 +189,14 @@
     <FxCompile Include="Fish3PixelShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
+    <FxCompile Include="StarfishVertexShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="StarfishPixelShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="StarfishGeometryShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

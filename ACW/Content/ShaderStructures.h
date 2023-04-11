@@ -37,4 +37,10 @@ namespace ACW
 		DirectX::XMFLOAT3 pos;
 		DirectX::XMFLOAT3 color;
 	};
+
+	struct VertexType
+	{
+		DirectX::XMFLOAT3 pos; 
+		DirectX::XMFLOAT2 col;
+	};
 }

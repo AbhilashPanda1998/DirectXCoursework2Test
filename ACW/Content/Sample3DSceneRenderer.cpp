@@ -156,7 +156,7 @@ void Sample3DSceneRenderer::Update(DX::StepTimer const& timer, const std::vector
 
 	}
 
-	XMStoreFloat4x4(&m_constantBufferDataCamera.fmodel, XMMatrixTranspose(XMMatrixRotationY(20)));
+	XMStoreFloat4x4(&m_constantBufferDataCamera.fmodel, XMMatrixTranspose(XMMatrixRotationY(0)));
 
 }
 
@@ -214,9 +214,10 @@ void Sample3DSceneRenderer::Render()
 	mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST);
 	RenderTerrain();
 	RenderWater();
-	
+
 	RenderSeaWeeds();
 	RenderCoral();
+	RenderStarfish();
 }
 
 void ACW::Sample3DSceneRenderer::RenderSpheres()
@@ -434,7 +435,7 @@ void ACW::Sample3DSceneRenderer::CreateSeaWeeds()
 		);
 		});
 
-	
+
 	auto hr = CreateDDSTextureFromFile(m_deviceResources->GetD3DDevice(), L"seaweeds.dds", nullptr, seaWeedsTexture.GetAddressOf());
 
 	//After the pixel shader file is loaded, create the shader
@@ -463,7 +464,7 @@ void ACW::Sample3DSceneRenderer::CreateSeaWeeds()
 
 	auto SeaWeedsTask = (VSTask && PSTask && GSTask).then([this]() {
 
-	static std::vector<Vertex> seaWeedsVertices;
+		static std::vector<Vertex> seaWeedsVertices;
 	static std::vector<unsigned short> seaWeedsIndices;
 
 	for (int i = -30; i < 30; i++)
@@ -752,7 +753,7 @@ void ACW::Sample3DSceneRenderer::CreateFishes()
 
 	auto FishTasks = (VSTask && PSTask && GSTask).then([this]() {
 
-	static std::vector<Vertex> fishVertices;
+		static std::vector<Vertex> fishVertices;
 	static std::vector<unsigned short> fishIndices;
 
 	for (int i = 1; i < 3; i++)
@@ -796,7 +797,7 @@ void ACW::Sample3DSceneRenderer::CreateFishes()
 
 	auto FishTask1 = (VSTask1 && PSTask1 && GSTask1).then([this]() {
 
-	static std::vector<Vertex> fish1Vertices;
+		static std::vector<Vertex> fish1Vertices;
 	static std::vector<unsigned short> fish1Indices;
 
 	for (int i = 1; i < 10; i++)
@@ -884,7 +885,7 @@ void ACW::Sample3DSceneRenderer::CreateFishes()
 
 	auto FishTask3 = (VSTask3 && PSTask3 && GSTask3).then([this]() {
 
-	static std::vector<Vertex> fish3Vertices;
+		static std::vector<Vertex> fish3Vertices;
 	static std::vector<unsigned short> fish3Indices;
 
 	for (int i = 1; i < 3; i++)
@@ -1455,6 +1456,226 @@ void ACW::Sample3DSceneRenderer::RenderCoral()
 	);
 }
 
+void ACW::Sample3DSceneRenderer::CreateStarfish()
+{
+	// Load shaders asynchronously.
+	auto VSTask = DX::ReadDataAsync(L"StarfishVertexShader.cso");
+	auto PSTask = DX::ReadDataAsync(L"StarfishPixelShader.cso");
+	auto GSTask = DX::ReadDataAsync(L"StarfishGeometryShader.cso");
+	// After the vertex shader file is loaded, create the shader and input layout.
+	auto createVSTask = VSTask.then([this](const std::vector<byte>& fileData) {
+		DX::ThrowIfFailed(
+			m_deviceResources->GetD3DDevice()->CreateVertexShader(
+				&fileData[0],
+				fileData.size(),
+				nullptr,
+				&m_StarfishVertexShader
+			)
+		);
+
+	static const D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateInputLayout(
+			vertexDesc,
+			ARRAYSIZE(vertexDesc),
+			&fileData[0],
+			fileData.size(),
+			&m_inputLayout
+		)
+	);
+		});
+
+	// After the pixel shader file is loaded, create the shader and constant buffer.
+	auto createPSTask = PSTask.then([this](const std::vector<byte>& fileData) {
+		DX::ThrowIfFailed(
+			m_deviceResources->GetD3DDevice()->CreatePixelShader(
+				&fileData[0],
+				fileData.size(),
+				nullptr,
+				&m_StarfishPixelShader
+			)
+		);
+
+	CD3D11_BUFFER_DESC constantBufferDesc(sizeof(ModelViewProjectionConstantBuffer), D3D11_BIND_CONSTANT_BUFFER);
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateBuffer(
+			&constantBufferDesc,
+			nullptr,
+			&m_constantBufferCamera
+		)
+	);
+		});
+
+
+
+	auto createGSTask = GSTask.then([this](const std::vector<byte>&
+		fileData) {
+			DX::ThrowIfFailed(
+				m_deviceResources->GetD3DDevice()->CreateGeometryShader(
+					&fileData[0],
+					fileData.size(),
+					nullptr,
+					&m_StarfishGeometryShader
+				)
+			);
+		});
+
+	// Once both shaders are loaded, create the mesh.
+	auto createCubeTask = (createPSTask && createVSTask && createGSTask).then([this]() {
+
+		static const VertexPositionColor cubeVertices[] =
+		{
+			 { XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
+
+			 // Arm vertices
+			 { XMFLOAT3(0.5f, 0.5f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
+			 { XMFLOAT3(-0.5f, 0.5f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
+			 { XMFLOAT3(0.5f, -0.5f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
+			 { XMFLOAT3(-0.5f, -0.5f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) }
+		};
+
+	D3D11_SUBRESOURCE_DATA vertexBufferData = { 0 };
+	vertexBufferData.pSysMem = cubeVertices;
+	vertexBufferData.SysMemPitch = 0;
+	vertexBufferData.SysMemSlicePitch = 0;
+	CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(cubeVertices), D3D11_BIND_VERTEX_BUFFER);
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateBuffer(
+			&vertexBufferDesc,
+			&vertexBufferData,
+			&m_StarfishVertexBuffer
+		)
+	);
+
+	// Load mesh indices. Each trio of indices represents
+	// a triangle to be rendered on the screen.
+	// For example: 0,2,1 means that the vertices with indexes
+	// 0, 2 and 1 from the vertex buffer compose the 
+	// first triangle of this mesh.
+	static const unsigned short cubeIndices[] =
+	{ 
+		0, 1, 2,
+		0, 2, 3,
+		0, 3, 4,
+		0, 4, 1,
+		
+		1, 2, 3, 4, 1
+	};
+
+	m_indexCount = ARRAYSIZE(cubeIndices);
+
+	D3D11_SUBRESOURCE_DATA indexBufferData = { 0 };
+	indexBufferData.pSysMem = cubeIndices;
+	indexBufferData.SysMemPitch = 0;
+	indexBufferData.SysMemSlicePitch = 0;
+	CD3D11_BUFFER_DESC indexBufferDesc(sizeof(cubeIndices), D3D11_BIND_INDEX_BUFFER);
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateBuffer(
+			&indexBufferDesc,
+			&indexBufferData,
+			&m_StarfishIndexBuffer
+		)
+	);
+		});
+
+	// Once the cube is loaded, the object is ready to be rendered.
+	createCubeTask.then([this]() {
+		m_loadingComplete = true;
+		});
+}
+
+void ACW::Sample3DSceneRenderer::RenderStarfish()
+{
+	// Loading is asynchronous. Only draw geometry after it's loaded.
+	if (!m_loadingComplete)
+	{
+		return;
+	}
+	auto context = m_deviceResources->GetD3DDeviceContext();
+
+	// Prepare the constant buffer to send it to the graphics device.
+	context->UpdateSubresource1(
+		m_constantBufferCamera.Get(),
+		0,
+		NULL,
+		&m_constantBufferDataCamera,
+		0,
+		0,
+		0
+	);
+
+	// Each vertex is one instance of the VertexPositionColor struct.
+	UINT stride = sizeof(VertexPositionColor);
+	UINT offset = 0;
+	context->IASetVertexBuffers(
+		0,
+		1,
+		m_StarfishVertexBuffer.GetAddressOf(),
+		&stride,
+		&offset
+	);
+
+	context->IASetIndexBuffer(
+		m_StarfishIndexBuffer.Get(),
+		DXGI_FORMAT_R16_UINT, // Each index is one 16-bit unsigned integer (short).
+		0
+	);
+
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	context->IASetInputLayout(m_inputLayout.Get());
+
+	// Attach our vertex shader.
+	context->VSSetShader(
+		m_StarfishVertexShader.Get(),
+		nullptr,
+		0
+	);
+
+	// Send the constant buffer to the graphics device.
+	context->VSSetConstantBuffers1(
+		0,
+		1,
+		m_constantBufferCamera.GetAddressOf(),
+		nullptr,
+		nullptr
+	);
+
+	// Attach our pixel shader.
+	context->PSSetShader(
+		m_StarfishPixelShader.Get(),
+		nullptr,
+		0
+	);
+
+	//Attach our geometry shader
+	context->GSSetShader(
+		m_StarfishGeometryShader.Get(),
+		nullptr,
+		0
+	);
+
+	context->GSSetConstantBuffers1(
+		0,
+		1,
+		m_constantBufferCamera.GetAddressOf(),
+		nullptr,
+		nullptr
+	);
+
+	// Draw the objects.
+	context->DrawIndexed(
+		m_indexCount,
+		0,
+		0
+	);
+}
+
 void ACW::Sample3DSceneRenderer::CreateCorals1()
 {
 	auto loadVSTaskFractals = DX::ReadDataAsync(L"FractalsVertex.cso");
@@ -1922,6 +2143,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 	CreateWater();
 	CreateFishes();
 	CreateSeaWeeds();
+	CreateStarfish();
 }
 
 void Sample3DSceneRenderer::ReleaseDeviceDependentResources()

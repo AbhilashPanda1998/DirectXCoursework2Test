@@ -15,12 +15,6 @@ cbuffer Light : register(b1)
     float4 lightColour;
 }
 
-cbuffer timeConstantBuffer : register(b2)
-{
-    float time;
-    float3 padding;
-}
-
 struct PixelShaderInput
 {
     float4 position : SV_POSITION;
@@ -66,35 +60,24 @@ float fractalNoise(in float2 xy)
 float4 main(PixelShaderInput input) : SV_TARGET
 {
     float4 finalColour = 0;
-    float4 diffuseColour = 0;
-    float diffuseFactor = 0;
-    float4 specularColour = 0;
-    float specularFactor = 0;
 
-    float4 ambientColour = float4(0.2, 0.2, 0.3, 1.0);
+    float4 ambientColour = float4(0, 0, 1, 0);
     float4 materialDiffuse = 0;
     float4 materialSpecular = 0;
     float4 texColour = 0;
+    float noise = fractalNoise(input.posWorld.xz);
 
-    materialDiffuse = float4(0.0, 0.6, 0.8, 1.0);
-    materialSpecular = float4(0.0, 0.7, 0.9, 1.0);
-    texColour = float4(0.0, 0.8, 1.0, 1.0);
+    materialDiffuse = float4(0.8 * noise, 0.3 * noise, 0.3 * noise, 1.0);
+    materialSpecular = float4(0.9 * noise, 0.4 * noise, 0.4 * noise, 1.0);
+    texColour = float4(0.1 * noise, 0.2 * noise, 1 * noise, 1.0);
 
     float4 viewDir = normalize(eye - input.posWorld);
     float4 lightDir = normalize(lightPos - input.posWorld);
     float4 reflection = normalize(reflect(-lightDir, input.norm));
 
-    diffuseFactor = saturate(dot(lightDir, input.norm));
-
-    if (diffuseFactor > 0)
-    {
-       specularFactor += pow(saturate(dot(viewDir, reflection)), 0.1 * 128);
-    }
-
-    diffuseColour = lightColour * diffuseFactor;
-    specularColour = lightColour * specularFactor;
-
-    finalColour = saturate(ambientColour + (diffuseColour * materialDiffuse) + (specularColour * materialSpecular));
+    finalColour = saturate(ambientColour + materialSpecular);
 
     return saturate(finalColour * texColour);
+
+    return texColour;
 }
