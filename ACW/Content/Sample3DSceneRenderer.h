@@ -44,15 +44,24 @@ namespace ACW
 		void CreateStarfish();
 		void RenderStarfish();
 
+		void CreateStarfish1();
+		void RenderStarfish1();
+
+		void CreateSpecialfish();
+		void RenderSpecialfish();
+
 		void CreateCorals1();
 		void RenderCorals1();
 		
 		void CreateBuffers();
 		void SetBuffers();
+
 		void UpdateBuffers();
 		void CreateBlendStates();
+		
 		void CreateDepthStencils();
 		void CreateRasteriserStates();
+		
 		void CreateSamplerState();
 
 	private:
@@ -137,6 +146,20 @@ namespace ACW
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_StarfishVertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_StarfishPixelShader;
 		Microsoft::WRL::ComPtr<ID3D11GeometryShader> m_StarfishGeometryShader;
+
+		//Starfish1 shaders
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Starfish1VertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Starfish1IndexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_Starfish1VertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_Starfish1PixelShader;
+		Microsoft::WRL::ComPtr<ID3D11GeometryShader> m_Starfish1GeometryShader;
+
+		//SpecialFish shaders
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_SpecialFishVertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_SpecialFishIndexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_SpecialFishVertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_SpecialFishPixelShader;
+		Microsoft::WRL::ComPtr<ID3D11GeometryShader> m_SpecialFishGeometryShader;
 
 		//Rasteriser states
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> mDefaultRasteriser;

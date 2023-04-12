@@ -43,4 +43,11 @@ namespace ACW
 		DirectX::XMFLOAT3 pos; 
 		DirectX::XMFLOAT2 col;
 	};
+
+	struct VertexNorm
+	{
+		DirectX::XMFLOAT3 position;  // 3D position
+		DirectX::XMFLOAT3 normal;    // Normal vector
+		DirectX::XMFLOAT2 texCoord;  // Texture coordinates
+	};
 }

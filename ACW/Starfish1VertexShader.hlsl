@@ -33,12 +33,12 @@ PixelShaderInput main(VertexShaderInput input)
     pos = mul(pos, view);
     pos = mul(pos, projection);
 
-    output.pos = pos;   
+    output.pos = pos;
     output.color = input.color;
-    output.pos.xyz *= 0.20f;
-    output.pos.y -= 1;
-    output.pos.z -= 1;
-    output.pos.x -= 5;
-    output.pos.x += time * 0.25f;
+    output.pos.xyz *= 0.32f;
+    output.pos.y -= 2;
+    output.pos.z = output.pos.z - 1;
+    output.pos.x = output.pos.x - 8;
+    output.pos.x += time * 0.15f;
     return output;
 }

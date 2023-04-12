@@ -9,20 +9,17 @@ cbuffer modelViewProjectionConstantBuffer : register(b0)
     float4 upDir;
 };
 
-cbuffer timeConstantBuffer : register(b1)
+cbuffer Light : register(b1)
 {
-    float time;
-    float3 padding;
+    float4 lightPos;
+    float4 lightColour;
 }
 
-struct VertexShaderInput
-{
-    float3 pos : POSITION;
-};
-
-struct GeometryShaderInput
+struct PixelShaderInput
 {
     float4 position : SV_POSITION;
+    float4 norm : NORMAL;
+    float4 posWorld : TEXCOORD;
 };
 
 float Hash(float2 grid)
@@ -60,16 +57,27 @@ float fractalNoise(in float2 xy)
     return f;
 }
 
-
-GeometryShaderInput main(VertexShaderInput input)
+float4 main(PixelShaderInput input) : SV_TARGET
 {
-    GeometryShaderInput output;
+    float4 finalColour = 0;
 
-    output.position = float4(input.pos.x - 10, input.pos.y + 10, input.pos.z + 10, 1);
-    output.position.x += time * 0.7;
-    output.position.y = fractalNoise(output.position.xz) + 0.1;
-    output.position.y += 16.f;
-    output.position.z += 18.f;
+    float4 ambientColour = float4(1, 0, 0, 0);
+    float4 materialDiffuse = 0;
+    float4 materialSpecular = 0;
+    float4 texColour = 0;
+    float noise = fractalNoise(input.posWorld.xz);
 
-    return output;
+    materialDiffuse = float4(0.8 * noise, 0.3 * noise, 0.3 * noise, 1.0);
+    materialSpecular = float4(0.9 * noise, 0.4 * noise, 0.4 * noise, 1.0);
+    texColour = float4(1 * noise, 0.5 * noise, 0.1 * noise, 1.0);
+
+    float4 viewDir = normalize(eye - input.posWorld);
+    float4 lightDir = normalize(lightPos - input.posWorld);
+    float4 reflection = normalize(reflect(-lightDir, input.norm));
+
+    finalColour = saturate(ambientColour + materialSpecular);
+
+    return saturate(finalColour * texColour);
+
+    return texColour;
 }
