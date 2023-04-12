@@ -36,8 +36,6 @@ PixelShaderInput main(VertexShaderInput input)
     output.pos = pos;   
     output.color = input.color;
     output.pos.xyz *= 0.20f;
-    output.pos.y -= 1;
-    output.pos.z -= 1;
     output.pos.x -= 5;
     output.pos.x += time * 0.25f;
     return output;

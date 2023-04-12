@@ -209,6 +209,7 @@ void Sample3DSceneRenderer::Render()
 	RenderImplicitShapes();
 	RenderImplicitPrimitives();
 	RenderCorals1();
+
 	RenderFishes();
 	RenderCoral();
 
@@ -217,8 +218,8 @@ void Sample3DSceneRenderer::Render()
 	RenderWater();
 	RenderSeaWeeds();
 	RenderStarfish();
-	//RenderStarfish1();
-	//RenderSpecialfish();
+	RenderStarfish1();
+	RenderSpecialfish();
 
 	
 }
@@ -2484,90 +2485,90 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 	CreateRasteriserStates();
 	CreateSamplerState();
 
-	//Load All Shader Files
-	auto loadVSTask = DX::ReadDataAsync(L"ImplicitShapesVertex.cso");
-	auto loadPSTask = DX::ReadDataAsync(L"ImplicitShapesPixel.cso");
+	////Load All Shader Files
+	//auto loadVSTask = DX::ReadDataAsync(L"ImplicitShapesVertex.cso");
+	//auto loadPSTask = DX::ReadDataAsync(L"ImplicitShapesPixel.cso");
 
-	//Implicit primitives shaders
-	auto loadVSTaskPrimitives = DX::ReadDataAsync(L"ImplicitPrimitivesVertex.cso");
-	auto loadPSTaskPrimitives = DX::ReadDataAsync(L"ImplicitPrimitivesPixel.cso");
+	////Implicit primitives shaders
+	//auto loadVSTaskPrimitives = DX::ReadDataAsync(L"ImplicitPrimitivesVertex.cso");
+	//auto loadPSTaskPrimitives = DX::ReadDataAsync(L"ImplicitPrimitivesPixel.cso");
 
 	//Shiny spheres shaders
 	auto loadVSTaskSpheres = DX::ReadDataAsync(L"ShinySphereRayTracerVertex.cso");
 	auto loadPSTaskSpheres = DX::ReadDataAsync(L"ShinySphereRayTracerPixel.cso");
 
-
-#pragma region Implicit shapes
-
-	//After the vertex shader file is loaded, create the shader and input layout.
-	auto ImplicitShapesVSTask = loadVSTask.then([this](const std::vector<byte>& fileData) {
-		DX::ThrowIfFailed(
-			m_deviceResources->GetD3DDevice()->CreateVertexShader(
-				&fileData[0],
-				fileData.size(),
-				nullptr,
-				&m_vertexShaderImplicitShapes
-			)
-		);
-
-	//Input layout
-	static const D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-
-	DX::ThrowIfFailed(
-		m_deviceResources->GetD3DDevice()->CreateInputLayout(
-			vertexDesc,
-			ARRAYSIZE(vertexDesc),
-			&fileData[0],
-			fileData.size(),
-			&m_inputLayout
-		)
-	);
-		});
-
-	//After the pixel shader file is loaded, create the shader.
-	auto ImplicitShapesPSTask = loadPSTask.then([this](const std::vector<byte>& fileData) {
-		DX::ThrowIfFailed(
-			m_deviceResources->GetD3DDevice()->CreatePixelShader(
-				&fileData[0],
-				fileData.size(),
-				nullptr,
-				&m_pixelShaderImplicitShapes
-			)
-		);
-		});
-
-#pragma endregion
-
-#pragma region Implicit primitives
-
-	//After the vertex shader file is loaded, create the shader.
-	auto ImplicitPrimitivesVSTask = loadVSTaskPrimitives.then([this](const std::vector<byte>& fileData) {
-		DX::ThrowIfFailed(
-			m_deviceResources->GetD3DDevice()->CreateVertexShader(
-				&fileData[0],
-				fileData.size(),
-				nullptr,
-				&m_vertexShaderImplicitPrimitives
-			)
-		);
-		});
-
-	//After the pixel shader file is loaded, create the shader.
-	auto ImplicitPrimitivesPSTask = loadPSTaskPrimitives.then([this](const std::vector<byte>& fileData) {
-		DX::ThrowIfFailed(
-			m_deviceResources->GetD3DDevice()->CreatePixelShader(
-				&fileData[0],
-				fileData.size(),
-				nullptr,
-				&m_pixelShaderImplicitPrimitives
-			)
-		);
-		});
-
-#pragma endregion
+//
+//#pragma region Implicit shapes
+//
+//	//After the vertex shader file is loaded, create the shader and input layout.
+//	auto ImplicitShapesVSTask = loadVSTask.then([this](const std::vector<byte>& fileData) {
+//		DX::ThrowIfFailed(
+//			m_deviceResources->GetD3DDevice()->CreateVertexShader(
+//				&fileData[0],
+//				fileData.size(),
+//				nullptr,
+//				&m_vertexShaderImplicitShapes
+//			)
+//		);
+//
+//	//Input layout
+//	static const D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
+//	{
+//		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+//	};
+//
+//	DX::ThrowIfFailed(
+//		m_deviceResources->GetD3DDevice()->CreateInputLayout(
+//			vertexDesc,
+//			ARRAYSIZE(vertexDesc),
+//			&fileData[0],
+//			fileData.size(),
+//			&m_inputLayout
+//		)
+//	);
+//		});
+//
+//	//After the pixel shader file is loaded, create the shader.
+//	auto ImplicitShapesPSTask = loadPSTask.then([this](const std::vector<byte>& fileData) {
+//		DX::ThrowIfFailed(
+//			m_deviceResources->GetD3DDevice()->CreatePixelShader(
+//				&fileData[0],
+//				fileData.size(),
+//				nullptr,
+//				&m_pixelShaderImplicitShapes
+//			)
+//		);
+//		});
+//
+//#pragma endregion
+//
+//#pragma region Implicit primitives
+//
+//	//After the vertex shader file is loaded, create the shader.
+//	auto ImplicitPrimitivesVSTask = loadVSTaskPrimitives.then([this](const std::vector<byte>& fileData) {
+//		DX::ThrowIfFailed(
+//			m_deviceResources->GetD3DDevice()->CreateVertexShader(
+//				&fileData[0],
+//				fileData.size(),
+//				nullptr,
+//				&m_vertexShaderImplicitPrimitives
+//			)
+//		);
+//		});
+//
+//	//After the pixel shader file is loaded, create the shader.
+//	auto ImplicitPrimitivesPSTask = loadPSTaskPrimitives.then([this](const std::vector<byte>& fileData) {
+//		DX::ThrowIfFailed(
+//			m_deviceResources->GetD3DDevice()->CreatePixelShader(
+//				&fileData[0],
+//				fileData.size(),
+//				nullptr,
+//				&m_pixelShaderImplicitPrimitives
+//			)
+//		);
+//		});
+//
+//#pragma endregion
 
 #pragma region Shiny Spheres
 	//After the vertex shader file is loaded, create the shader
@@ -2594,16 +2595,17 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 		);
 		});
 #pragma endregion
-	CreateCorals1();
 	CreateCoral();
 	CreateTerrain();
 	CreateWater();
 	CreateFishes();
 	CreateSeaWeeds();
 
-	//CreateStarfish();
-	//CreateStarfish1();
-	//CreateSpecialfish();
+	CreateStarfish();
+	CreateStarfish1();
+	CreateSpecialfish();
+
+	CreateCorals1();
 }
 
 void Sample3DSceneRenderer::ReleaseDeviceDependentResources()
