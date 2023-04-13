@@ -1,18 +1,17 @@
-//static float4 eye = float4(0, 0, 15, 1);
-static float nearPlane = 1.0;
+static float nearPlane = 0.5;
 static float farPlane = 1000.0;
 
 static float4 lightColour = float4(1, 1, 1, 1);
-static float3 lightPos = float3(-10, 100, -10);
+static float3 lightPos = float3(30, 90, -30);
 static float4 backgroundColour = float4(0.1, 0.1, 0.1, 1);
 
-static float4 sphereColour1 = float4(1, 0, 0, 1); 
-static float4 sphereColour2 = float4(0, 1, 0, 1); 
-static float4 sphereColour3 = float4(1, 0, 1, 1); 
-static float shininess = 40;
+static float4 sphereColour1 = float4(1, 1, 1,1); 
+static float4 sphereColour2 = float4(1, 1, 1, 1);
+static float4 sphereColour3 = float4(1, 1, 1, 1);
+static float shininess = 140;
 
 
-#define NOBJECTS 3
+#define NOBJECTS 11
 
 // A constant buffer that stores the three basic column-major matrices for composing geometry.
 cbuffer ModelViewProjectionConstantBuffer : register(b0)
@@ -34,9 +33,18 @@ struct Sphere
 };
 
 static Sphere spheres[NOBJECTS] = {
-	{ 0.0, 1.0, 0.0, 1.0, sphereColour1, 0.3, 0.5, 0.7, shininess },
-	{ 0.0, 3.0, 0.0, 0.25, sphereColour2, 0.5, 0.7, 0.4, shininess },
-	{ -2.5, 1.0, 0.0, 2, sphereColour3, 0.5, 0.3, 0.3, shininess }
+	{ -5.0, -5.0, 0.0, 0.0010, sphereColour1, 0.3, 0.5, 0.7, shininess },
+    { 4.0, -5.0, 0.0, 0.0010, sphereColour2, 0.5, 0.7, 0.4, shininess },
+    { 1.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+    { -2.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+    { -3.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+    { 8.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+    { 7.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+    { -10.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+    { 4.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+    { 2.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+    { -4.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+
 };
 
 struct Ray
@@ -189,33 +197,6 @@ float4 RayTracing(Ray ray)
 	}
 	return colour;
 }
-
-//float4 RayCasting(Ray eyeRay)
-//{
-//	bool hit = false;
-//	float time = SphereIntersect(eyeRay, hit);
-//	float3 interP = eyeRay.origin + time * normalize(eyeRay.direction);
-//
-//	float4 RTColour = (float4)0;
-//
-//	if (!hit)
-//	{
-//		RTColour = backgroundColour;
-//	}
-//	else
-//	{
-//		float3 colour = lightColour.rgb;
-//		float3 normal = normalize(interP);
-//		normal = normalize(normal);
-//		float3 lightDir = normalize(lightPos - interP);
-//		float3 viewDir = normalize(eye.xyz - interP);
-//		float3 reflectedLight = reflect(-lightDir, normal);
-//		float reflection = max(0.5 * dot(normal, lightDir), 0.2);
-//		reflection += pow(max(0.1, dot(reflectedLight, viewDir)), 5.0);
-//		RTColour = float4(1.5 * reflection * colour, 1.0);
-//	}
-//	return RTColour;
-//}
 
 
 PixelShaderOutput main(VS_QUAD input)

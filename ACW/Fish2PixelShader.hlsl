@@ -44,7 +44,7 @@ float Noise(in float2 p)
     return n1; //2*(2.0*n1 -1.0);
 }
 
-float fractalNoise(in float2 xy)
+float PatternShades(in float2 xy)
 {
     float w = .7;
     float f = 0.0;
@@ -65,7 +65,7 @@ float4 main(PixelShaderInput input) : SV_TARGET
     float4 materialDiffuse = 0;
     float4 materialSpecular = 0;
     float4 texColour = 0;
-    float noise = fractalNoise(input.posWorld.xz);
+    float noise = PatternShades(input.posWorld.xz);
 
     materialDiffuse = float4(0.8 * noise, 0.3 * noise, 0.3 * noise, 1.0);
     materialSpecular = float4(0.9 * noise, 0.4 * noise, 0.4 * noise, 1.0);

@@ -44,7 +44,7 @@ float Noise(in float2 p)
     return n1; //2*(2.0*n1 -1.0);
 }
 
-float fractalNoise(in float2 xy)
+float PatternShades(in float2 xy)
 {
     float w = .7;
     float f = 0.0;
@@ -74,13 +74,13 @@ float4 main(PixelShaderInput input) : SV_TARGET
     {
         materialDiffuse = float4(0.1, 0.1, 0.1, 0.1);
         materialSpecular = float4(2.1, 3.2, 1.1, 1.0);
-        texColour = float4(1.0, 0.7, 0.3, 1.0) * fractalNoise(input.posWorld.xz);
+        texColour = float4(1.0, 0.7, 0.3, 1.0) * PatternShades(input.posWorld.xz);
     }
     else
     {
         materialDiffuse = float4(0.2, 0.2, 0.2, 0.2);
         materialSpecular = float4(0.2, 0.3, 0.1, 1.0);
-        texColour = float4(0.4, 1.0, 0.1, 1.0) * fractalNoise(input.posWorld.xz);
+        texColour = float4(0.4, 1.0, 0.1, 1.0) * PatternShades(input.posWorld.xz);
     }
 
     float4 viewDir = normalize(eye - input.posWorld);

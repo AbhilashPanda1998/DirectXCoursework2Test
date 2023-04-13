@@ -47,7 +47,7 @@ float Noise(in float2 p)
     return n1; //2*(2.0*n1 -1.0);
 }
 
-float fractalNoise(in float2 xy)
+float PatternShades(in float2 xy)
 {
     float w = .7;
     float f = 0.0;
@@ -67,7 +67,7 @@ GeometryShaderInput main(VertexShaderInput input)
 
     output.position = float4(input.pos.x - 20, input.pos.y, input.pos.z + 12, 1);
     output.position.x += time * 0.6;
-    output.position.y = fractalNoise(output.position.xz) /*+ 0.1*/;
+    output.position.y = PatternShades(output.position.xz) /*+ 0.1*/;
     output.position.y += 17;
     output.position.z += 35.f;
 

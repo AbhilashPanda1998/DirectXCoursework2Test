@@ -123,10 +123,6 @@ namespace ACW
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> fish3PixelShader;
 		Microsoft::WRL::ComPtr<ID3D11GeometryShader> fish3GeometryShader;
 
-		//Fractal shaders
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShaderFractals;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> mPixelShaderFractals;
-
 		//Water shaders
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShaderWater;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> mPixelShaderWater;
@@ -139,6 +135,10 @@ namespace ACW
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_CoralvertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_CoralpixelShader;
 		Microsoft::WRL::ComPtr<ID3D11GeometryShader> m_CoralGeometryShader;
+
+		//Corals1 shaders
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_Corals1VertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_Corals1PixelShader;
 
 		//Starfish shaders
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_StarfishVertexBuffer;

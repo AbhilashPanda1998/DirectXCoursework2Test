@@ -87,12 +87,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Content\ImplicitShapesVertex.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Content\ImplicitShapesPixel.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
     <FxCompile Include="Content\TerrainDomain.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
@@ -132,16 +126,10 @@
     <FxCompile Include="Content\WaterVertex.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
-    <FxCompile Include="Content\ImplicitPrimitivesPixel.hlsl">
+    <FxCompile Include="Content\Corals1PixelShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
-    <FxCompile Include="Content\ImplicitPrimitivesVertex.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Content\FractalsPixel.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Content\FractalsVertex.hlsl">
+    <FxCompile Include="Content\Corals1VertexShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
     <FxCompile Include="Content\FishGeometryShader.hlsl">

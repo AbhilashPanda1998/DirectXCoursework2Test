@@ -57,7 +57,7 @@ float Noise(in float2 p)
     return n1; //2*(2.0*n1 -1.0);
 }
 
-float fractalNoise(in float2 xy)
+float PatternShades(in float2 xy)
 {
     float w = .5;
     float f = 0.0;
@@ -79,10 +79,10 @@ PixelShaderInput main(Quad input, float2 UV : SV_DomainLocation, const OutputPat
     float3 vPos2 = (1.0 - UV.y) * QuadPos[2].xyz + UV.y * QuadPos[3].xyz;
     float3 uvPos = (1.0 - UV.x) * vPos1 + UV.x * vPos2;
 
-    uvPos.y = fractalNoise(uvPos.xz);
+    uvPos.y = PatternShades(uvPos.xz);
 
-    float dYx = fractalNoise(uvPos.xz + float2(0.1, 0.0));
-    float dYz = fractalNoise(uvPos.xz + float2(0.0, 0.1));
+    float dYx = PatternShades(uvPos.xz + float2(0.1, 0.0));
+    float dYz = PatternShades(uvPos.xz + float2(0.0, 0.1));
 
     float3 N = normalize(float3(uvPos.y - dYx, 0.2, uvPos.y - dYz));
 

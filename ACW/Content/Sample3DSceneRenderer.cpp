@@ -204,7 +204,6 @@ void Sample3DSceneRenderer::Render()
 	mContext->OMSetDepthStencilState(mDepthLessThanEqualAll.Get(), 0);
 
 
-	//Draw ray casted effects
 	RenderSpheres();
 	RenderImplicitShapes();
 	RenderImplicitPrimitives();
@@ -213,6 +212,7 @@ void Sample3DSceneRenderer::Render()
 	RenderFishes();
 	RenderCoral();
 
+
 	mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST);
 	RenderTerrain();
 	RenderWater();
@@ -220,12 +220,11 @@ void Sample3DSceneRenderer::Render()
 	RenderStarfish();
 	RenderStarfish1();
 	RenderSpecialfish();
-
-	
 }
 
 void ACW::Sample3DSceneRenderer::RenderSpheres()
 {
+
 	// Attach our vertex shader.
 	mContext->VSSetShader(
 		mVertexShaderSpheres.Get(),
@@ -2137,41 +2136,36 @@ void ACW::Sample3DSceneRenderer::RenderSpecialfish()
 
 void ACW::Sample3DSceneRenderer::CreateCorals1()
 {
-	auto loadVSTaskFractals = DX::ReadDataAsync(L"FractalsVertex.cso");
-	auto loadPSTaskFractals = DX::ReadDataAsync(L"FractalsPixel.cso");
+	auto loadVSTask = DX::ReadDataAsync(L"Corals1VertexShader.cso");
+	auto loadPSTask = DX::ReadDataAsync(L"Corals1PixelShader.cso");
 
 	//After the vertex shader file is loaded, create the shader
-	auto FractalsVSTask = loadVSTaskFractals.then([this](const std::vector<byte>& fileData) {
+	auto VSTask = loadVSTask.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreateVertexShader(
 				&fileData[0],
 				fileData.size(),
 				nullptr,
-				&mVertexShaderFractals
+				&m_Corals1VertexShader
 			)
 		);
 		});
 
 	//After the pixel shader file is loaded, create the shader
-	auto FractalsPSTask = loadPSTaskFractals.then([this](const std::vector<byte>& fileData) {
+	auto PSTask = loadPSTask.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreatePixelShader(
 				&fileData[0],
 				fileData.size(),
 				nullptr,
-				&mPixelShaderFractals
+				&m_Corals1PixelShader
 			)
 		);
 		});
 
 
 	//Once the shaders using the cube vertices are loaded, load the cube vertices
-	auto createCubeTask = (/*ImplicitShapesPSTask && ImplicitShapesVSTask
-		&& ImplicitPrimitivesPSTask && ImplicitPrimitivesVSTask
-		&& TerrainVSTask && TerrainPSTask && TerrainDSTask && TerrainHSTask
-		&& WaterVSTask && WaterPSTask && WaterDSTask && WaterHSTask
-		&& SpheresVSTask && SpheresPSTask
-		&& */FractalsVSTask && FractalsPSTask).then([this]() {
+	auto createCubeTask = (VSTask && PSTask).then([this]() {
 
 			static const Vertex cubeVertices[] =
 			{
@@ -2245,14 +2239,14 @@ void ACW::Sample3DSceneRenderer::RenderCorals1()
 {
 	// Attach our vertex shader.
 	mContext->VSSetShader(
-		mVertexShaderFractals.Get(),
+		m_Corals1VertexShader.Get(),
 		nullptr,
 		0
 	);
 
 	// Attach our pixel shader.
 	mContext->PSSetShader(
-		mPixelShaderFractals.Get(),
+		m_Corals1PixelShader.Get(),
 		nullptr,
 		0
 	);

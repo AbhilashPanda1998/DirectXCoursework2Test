@@ -41,44 +41,7 @@ float2 opU(float2 d1, float2 d2)
 
 #define ZERO 0
 
-//------------------------------------------------------------------
-float tetrahedron(float3 p, float scale, float iterations) {
-	p.y -= 2.0;
-
-	const float3 p0 = float3(-1, -1, -1);
-	const float3 p1 = float3(1, 1, -1);
-	const float3 p2 = float3(1, -1, 1);
-	const float3 p3 = float3(-1, 1, 1);
-
-	for (int i = 0; i < iterations; ++i) {
-		float d = distance(p, p0);
-		float3 c = p0;
-
-		float t = distance(p, p1);
-		if (t < d) {
-			d = t;
-			c = p1;
-		}
-
-		t = distance(p, p2);
-		if (t < d) {
-			d = t;
-			c = p2;
-		}
-
-		t = distance(p, p3);
-		if (t < d) {
-			d = t;
-			c = p3;
-		}
-
-		p = (p - c)*scale;
-	}
-
-	return length(p)*pow(scale, -float(iterations)) - 0.025*0.5;
-}
-
-float2 mandelbulb(float3 pos) {
+float2 coral(float3 pos) {
 	float n = 8.0;
 	float t0 = 1.0;
 	float dr = 1.0;
@@ -87,7 +50,7 @@ float2 mandelbulb(float3 pos) {
 
 	float3 z = pos;
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		r = length(z);
 
@@ -96,9 +59,9 @@ float2 mandelbulb(float3 pos) {
 		phi = atan(z.y / z.x);
 		theta = asin(z.z / r);
 
-		dr = pow(r, n - 1.0)*dr *n + 1.0;
+		dr = pow(r, n - 1.0)*dr *n + 5.0;
 
-		z = pow(r, n)*float3(sin(n*theta)*cos(n*phi), sin(n*theta)*sin(n*phi), cos(n*theta)) + pos;
+		z = pow(r, n)*float3(cos(n*theta * 3.f)*cos(n*phi), sin(n*theta)*sin(n*phi), sin(n*theta)) + pos;
 		t0 = min(r, t0);
 	}
 	return float2(r*log(r) / dr / 2.0, t0);
@@ -108,9 +71,8 @@ float2 map(in float3 inPos)
 {
 	float3 pos = inPos;
 	float2 res = float2(1e10, 0.0);
-
-	res = opU(res, float2(tetrahedron(pos - float3(4, 2, -5), 2, 10), 60));
-	res = opU(res, mandelbulb(pos - float3(0, 2, -5)));
+	
+    res = opU(res, coral(pos - float3(0, 2, -5)));
 
 	return res;
 }
@@ -136,14 +98,14 @@ float2 castRay(in float3 ro, in float3 rd)
 	float tmax = 20.0;
 
 	// raymarch primitives   
-	float2 tb = iBox(ro, rd, float3(1000, 1000, 1000));
+    float2 tb = iBox(ro, rd, float3(500, 500, 500));
 	if (tb.x<tb.y && tb.y>0.0 && tb.x < tmax)
 	{
 		tmin = max(tb.x, tmin);
 		tmax = min(tb.y, tmax);
 
 		float t = tmin;
-		for (int i = 0; i < 170 && t < tmax; i++)
+		for (int i = 0; i < 55 && t < tmax; i++)
 		{
 			float2 h = map(ro + rd * t);
 			if (abs(h.x) < (0.00001*t))
@@ -169,7 +131,7 @@ float calcSoftshadow(in float3 ro, in float3 rd, in float mint, in float tmax)
 	for (int i = ZERO; i < 16; i++)
 	{
 		float h = map(ro + rd * t).x;
-		res = min(res, 8.0*h / t);
+		res = min(res, 2.0*h / t);
 		t += clamp(h, 0.02, 0.10);
 	}
 	return clamp(res, 0.0, 1.0);

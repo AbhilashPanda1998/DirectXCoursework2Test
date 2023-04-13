@@ -13,6 +13,19 @@ struct VS_Canvas
 	float2 canvasXY : TEXCOORD0;
 };
 
+cbuffer timeConstantBuffer : register(b1)
+{
+    float time;
+    float3 padding;
+}
+
+float GetRandomValue(float minValue, float maxValue)
+{
+    float randomValue = frac(cos(time * 12345.6789)) * (maxValue - minValue) + minValue;
+    return randomValue;
+}
+
+	
 VS_Canvas main(float4 vPos : POSITION)
 {
 	VS_Canvas output;
@@ -22,5 +35,7 @@ VS_Canvas main(float4 vPos : POSITION)
 	float aspectRatio = projection._m11 / projection._m00;
 	output.canvasXY = sign(vPos.xy) * float2(aspectRatio, 1.0);
 
+  
+    output.position.y += time * 0.12f;
 	return output;
 }
