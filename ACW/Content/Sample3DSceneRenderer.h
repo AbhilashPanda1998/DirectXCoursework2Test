@@ -22,25 +22,27 @@ namespace ACW
 		void Render();
 
 	private:
-		void RenderSpheres();
+		void RenderBubbles();
 		void RenderImplicitShapes();
 		void RenderImplicitPrimitives();
 		
+		//Water and terrain done using vertex, pixel, hull, and domain shader
+
 		void CreateTerrain();
 		void RenderTerrain();
 
+		void CreateWater();
+		void RenderWater();
+
+		//Sea Plants done using vertex, pixel and geometry shader
+
 		void CreateSeaWeeds();
 		void RenderSeaWeeds();
-		
+
+		//Different types of fish experient using vertex, pixel and geometry shader
 		void CreateFishes();
 		void RenderFishes();
 		
-		void CreateWater();
-		void RenderWater();
-		
-		void CreateCoral();
-		void RenderCoral();
-
 		void CreateStarfish();
 		void RenderStarfish();
 
@@ -50,8 +52,21 @@ namespace ACW
 		void CreateSpecialfish();
 		void RenderSpecialfish();
 
+		//For Creating Coral using Geometry Shader
+		void CreateCoral();
+		void RenderCoral();
+
+		//For Creating Coral using Pixel Shader
 		void CreateCorals1();
 		void RenderCorals1();
+
+		//For Creating Coral using Vertex Shader
+		void CreateCorals2();
+		void RenderCorals2();
+
+		//For Creating Coral using Hull and Domain Shader
+		void CreateCorals3();
+		void RenderCorals3();
 		
 		void CreateBuffers();
 		void SetBuffers();
@@ -102,9 +117,9 @@ namespace ACW
 		Microsoft::WRL::ComPtr<ID3D11HullShader> mHullShaderTerrain;
 		Microsoft::WRL::ComPtr<ID3D11DomainShader> mDomainShaderTerrain;
 
-		//Spheres shaders
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShaderSpheres;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> mPixelShaderSpheres;
+		//Bubbles shaders
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShaderBubbles;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> mPixelShaderBubbles;
 
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> seaWeedsVertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> seaWeedsPixelShader;
@@ -139,6 +154,22 @@ namespace ACW
 		//Corals1 shaders
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_Corals1VertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_Corals1PixelShader;
+
+
+		//Coral2 shaders
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Coral2VertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Coral2IndexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_Coral2vertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_Coral2pixelShader;
+		Microsoft::WRL::ComPtr<ID3D11GeometryShader> m_Coral2GeometryShader;
+
+		//Coral3 shaders
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Coral3VertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Coral3IndexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_Coral3vertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_Coral3pixelShader;
+		Microsoft::WRL::ComPtr<ID3D11HullShader> m_Coral3HullShader;
+		Microsoft::WRL::ComPtr<ID3D11DomainShader> m_Coral3DomainShader;
 
 		//Starfish shaders
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_StarfishVertexBuffer;

@@ -99,10 +99,10 @@
     <FxCompile Include="Content\TerrainVertex.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
-    <FxCompile Include="Content\ShinySphereRayTracerPixel.hlsl">
+    <FxCompile Include="Content\BubblesRayTracerPixel.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
-    <FxCompile Include="Content\ShinySphereRayTracerVertex.hlsl">
+    <FxCompile Include="Content\BubblesRayTracerVertex.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
     <FxCompile Include="Content\SeaWeedsGeometryShader.hlsl">
@@ -202,6 +202,27 @@
       <Filter>Content</Filter>
     </FxCompile>
     <FxCompile Include="SpecialFishGeometryShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="Coral2PixelShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="Coral2VertexShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="Coral2GeometryShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="Coral3VertexShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="Coral3PixelShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="Coral3HullShader.hlsl">
+      <Filter>Content</Filter>
+    </FxCompile>
+    <FxCompile Include="Coral3DomainShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
   </ItemGroup>

@@ -204,16 +204,17 @@ void Sample3DSceneRenderer::Render()
 	mContext->OMSetDepthStencilState(mDepthLessThanEqualAll.Get(), 0);
 
 
-	RenderSpheres();
+	RenderBubbles();
 	RenderImplicitShapes();
 	RenderImplicitPrimitives();
 	RenderCorals1();
 
 	RenderFishes();
+	RenderCorals2();
 	RenderCoral();
 
-
 	mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST);
+	RenderCorals3();
 	RenderTerrain();
 	RenderWater();
 	RenderSeaWeeds();
@@ -222,19 +223,19 @@ void Sample3DSceneRenderer::Render()
 	RenderSpecialfish();
 }
 
-void ACW::Sample3DSceneRenderer::RenderSpheres()
+void ACW::Sample3DSceneRenderer::RenderBubbles()
 {
 
 	// Attach our vertex shader.
 	mContext->VSSetShader(
-		mVertexShaderSpheres.Get(),
+		mVertexShaderBubbles.Get(),
 		nullptr,
 		0
 	);
 
 	// Attach our pixel shader.
 	mContext->PSSetShader(
-		mPixelShaderSpheres.Get(),
+		mPixelShaderBubbles.Get(),
 		nullptr,
 		0
 	);
@@ -2259,6 +2260,435 @@ void ACW::Sample3DSceneRenderer::RenderCorals1()
 	);
 }
 
+void ACW::Sample3DSceneRenderer::CreateCorals2()
+{
+	// Load shaders asynchronously.
+	auto VSTask = DX::ReadDataAsync(L"Coral2VertexShader.cso");
+	auto PSTask = DX::ReadDataAsync(L"Coral2PixelShader.cso");
+	auto GSTask = DX::ReadDataAsync(L"Coral2GeometryShader.cso");
+	// After the vertex shader file is loaded, create the shader and input layout.
+	auto createVSTask = VSTask.then([this](const std::vector<byte>& fileData) {
+		DX::ThrowIfFailed(
+			m_deviceResources->GetD3DDevice()->CreateVertexShader(
+				&fileData[0],
+				fileData.size(),
+				nullptr,
+				&m_Coral2vertexShader
+			)
+		);
+
+	static const D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateInputLayout(
+			vertexDesc,
+			ARRAYSIZE(vertexDesc),
+			&fileData[0],
+			fileData.size(),
+			&m_inputLayout
+		)
+	);
+		});
+
+	// After the pixel shader file is loaded, create the shader and constant buffer.
+	auto createPSTask = PSTask.then([this](const std::vector<byte>& fileData) {
+		DX::ThrowIfFailed(
+			m_deviceResources->GetD3DDevice()->CreatePixelShader(
+				&fileData[0],
+				fileData.size(),
+				nullptr,
+				&m_Coral2pixelShader
+			)
+		);
+
+	CD3D11_BUFFER_DESC constantBufferDesc(sizeof(ModelViewProjectionConstantBuffer), D3D11_BIND_CONSTANT_BUFFER);
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateBuffer(
+			&constantBufferDesc,
+			nullptr,
+			&m_constantBufferCamera
+		)
+	);
+		});
+
+
+	auto createGSTask = GSTask.then([this](const std::vector<byte>&
+		fileData) {
+			DX::ThrowIfFailed(
+				m_deviceResources->GetD3DDevice()->CreateGeometryShader(
+					&fileData[0],
+					fileData.size(),
+					nullptr,
+					&m_Coral2GeometryShader
+				)
+			);
+		});
+
+	// Once both shaders are loaded, create the mesh.
+	auto createCubeTask = (createPSTask && createVSTask && createGSTask).then([this]() {
+
+		// Load mesh vertices. Each vertex has a position and a color.
+		static const VertexPositionColor cubeVertices[] =
+		{
+			{XMFLOAT3(-0.5f, -0.5f, -0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f)},
+			{XMFLOAT3(-0.5f, -0.5f,  0.5f), XMFLOAT3(0.0f, 0.0f, 1.0f)},
+			{XMFLOAT3(-0.5f,  0.5f, -0.5f), XMFLOAT3(0.0f, 1.0f, 0.0f)},
+			{XMFLOAT3(-0.5f,  0.5f,  0.5f), XMFLOAT3(0.0f, 1.0f, 1.0f)},
+			{XMFLOAT3(0.5f, -0.5f, -0.5f), XMFLOAT3(1.0f, 0.0f, 0.0f)},
+			{XMFLOAT3(0.5f, -0.5f,  0.5f), XMFLOAT3(1.0f, 0.0f, 1.0f)},
+			{XMFLOAT3(0.5f,  0.5f, -0.5f), XMFLOAT3(1.0f, 1.0f, 0.0f)},
+			{XMFLOAT3(0.5f,  0.5f,  0.5f), XMFLOAT3(1.0f, 1.0f, 1.0f)},
+		};
+
+	D3D11_SUBRESOURCE_DATA vertexBufferData = { 0 };
+	vertexBufferData.pSysMem = cubeVertices;
+	vertexBufferData.SysMemPitch = 0;
+	vertexBufferData.SysMemSlicePitch = 0;
+	CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(cubeVertices), D3D11_BIND_VERTEX_BUFFER);
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateBuffer(
+			&vertexBufferDesc,
+			&vertexBufferData,
+			&m_Coral2VertexBuffer
+		)
+	);
+
+	// Load mesh indices. Each trio of indices represents
+	// a triangle to be rendered on the screen.
+	// For example: 0,2,1 means that the vertices with indexes
+	// 0, 2 and 1 from the vertex buffer compose the 
+	// first triangle of this mesh.
+	static const unsigned short cubeIndices[] =
+	{
+		0,2,1, // -x
+		1,2,3,
+
+		4,5,6, // +x
+		5,7,6,
+
+		0,1,5, // -y
+		0,5,4,
+
+		2,6,7, // +y
+		2,7,3,
+
+		0,4,6, // -z
+		0,6,2,
+
+		1,3,7, // +z
+		1,7,5,
+	};
+
+	m_indexCount = ARRAYSIZE(cubeIndices);
+
+	D3D11_SUBRESOURCE_DATA indexBufferData = { 0 };
+	indexBufferData.pSysMem = cubeIndices;
+	indexBufferData.SysMemPitch = 0;
+	indexBufferData.SysMemSlicePitch = 0;
+	CD3D11_BUFFER_DESC indexBufferDesc(sizeof(cubeIndices), D3D11_BIND_INDEX_BUFFER);
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateBuffer(
+			&indexBufferDesc,
+			&indexBufferData,
+			&m_Coral2IndexBuffer
+		)
+	);
+		});
+
+	// Once the cube is loaded, the object is ready to be rendered.
+	createCubeTask.then([this]() {
+		m_loadingComplete = true;
+		});
+}
+
+void ACW::Sample3DSceneRenderer::RenderCorals2()
+{
+	// Loading is asynchronous. Only draw geometry after it's loaded.
+	if (!m_loadingComplete)
+	{
+		return;
+	}
+	auto context = m_deviceResources->GetD3DDeviceContext();
+
+	// Prepare the constant buffer to send it to the graphics device.
+	context->UpdateSubresource1(
+		m_constantBufferCamera.Get(),
+		0,
+		NULL,
+		&m_constantBufferDataCamera,
+		0,
+		0,
+		0
+	);
+
+	// Each vertex is one instance of the VertexPositionColor struct.
+	UINT stride = sizeof(VertexPositionColor);
+	UINT offset = 0;
+	context->IASetVertexBuffers(
+		0,
+		1,
+		m_Coral2VertexBuffer.GetAddressOf(),
+		&stride,
+		&offset
+	);
+
+	context->IASetIndexBuffer(
+		m_Coral2IndexBuffer.Get(),
+		DXGI_FORMAT_R16_UINT, // Each index is one 16-bit unsigned integer (short).
+		0
+	);
+
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	context->IASetInputLayout(m_inputLayout.Get());
+
+	// Attach our vertex shader.
+	context->VSSetShader(
+		m_Coral2vertexShader.Get(),
+		nullptr,
+		0
+	);
+
+	// Send the constant buffer to the graphics device.
+	context->VSSetConstantBuffers1(
+		0,
+		1,
+		m_constantBufferCamera.GetAddressOf(),
+		nullptr,
+		nullptr
+	);
+
+	// Attach our pixel shader.
+	context->PSSetShader(
+		m_Coral2pixelShader.Get(),
+		nullptr,
+		0
+	);
+
+	//Attach our geometry shader
+	context->GSSetShader(
+		nullptr,
+		nullptr,
+		0
+	);
+
+	context->GSSetConstantBuffers1(
+		0,
+		1,
+		m_constantBufferCamera.GetAddressOf(),
+		nullptr,
+		nullptr
+	);
+
+	// Draw the objects.
+	context->DrawIndexed(
+		m_indexCount,
+		0,
+		0
+	);
+}
+
+void ACW::Sample3DSceneRenderer::CreateCorals3()
+{
+
+	// Load shaders asynchronously.
+	auto VSTask = DX::ReadDataAsync(L"Coral3VertexShader.cso");
+	auto PSTask = DX::ReadDataAsync(L"Coral3PixelShader.cso");
+	auto DSTask = DX::ReadDataAsync(L"Coral3DomainShader.cso");
+	auto HSTask = DX::ReadDataAsync(L"Coral3HullShader.cso");
+	// After the vertex shader file is loaded, create the shader and input layout.
+	auto createVSTask = VSTask.then([this](const std::vector<byte>& fileData) {
+		DX::ThrowIfFailed(
+			m_deviceResources->GetD3DDevice()->CreateVertexShader(
+				&fileData[0],
+				fileData.size(),
+				nullptr,
+				&m_Coral3vertexShader
+			)
+		);
+
+	static const D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateInputLayout(
+			vertexDesc,
+			ARRAYSIZE(vertexDesc),
+			&fileData[0],
+			fileData.size(),
+			&m_inputLayout
+		)
+	);
+		});
+
+	// After the pixel shader file is loaded, create the shader and constant buffer.
+	auto createPSTask = PSTask.then([this](const std::vector<byte>& fileData) {
+		DX::ThrowIfFailed(
+			m_deviceResources->GetD3DDevice()->CreatePixelShader(
+				&fileData[0],
+				fileData.size(),
+				nullptr,
+				&m_Coral3pixelShader
+			)
+		);
+
+	CD3D11_BUFFER_DESC constantBufferDesc(sizeof(ModelViewProjectionConstantBuffer), D3D11_BIND_CONSTANT_BUFFER);
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateBuffer(
+			&constantBufferDesc,
+			nullptr,
+			&m_constantBufferCamera
+		)
+	);
+		});
+
+	//After the domain shader file is loaded, create the shader
+	auto createDSTask = DSTask.then([this](const std::vector<byte>& fileData) {
+		DX::ThrowIfFailed(
+			m_deviceResources->GetD3DDevice()->CreateDomainShader(
+				&fileData[0],
+				fileData.size(),
+				nullptr,
+				&m_Coral3DomainShader
+			)
+		);
+		});
+
+	//After the hull shader file is loaded, create the shader
+	auto createHSTask = HSTask.then([this](const std::vector<byte>& fileData) {
+		DX::ThrowIfFailed(
+			m_deviceResources->GetD3DDevice()->CreateHullShader(
+				&fileData[0],
+				fileData.size(),
+				nullptr,
+				&m_Coral3HullShader
+			)
+		);
+		});
+
+
+	// Once both shaders are loaded, create the mesh.
+	auto createCubeTask = (createPSTask && createVSTask && createDSTask && createHSTask).then([this]() {
+
+		// Load mesh vertices. Each vertex has a position and a color.
+		static const VertexPositionColor cubeVertices[] =
+		{
+			{XMFLOAT3(-0.5f, -0.5f, -0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f)},
+			{XMFLOAT3(-0.5f, -0.5f,  0.5f), XMFLOAT3(0.0f, 0.0f, 1.0f)},
+			{XMFLOAT3(-0.5f,  0.5f, -0.5f), XMFLOAT3(0.0f, 1.0f, 0.0f)},
+			{XMFLOAT3(-0.5f,  0.5f,  0.5f), XMFLOAT3(0.0f, 1.0f, 1.0f)},
+			{XMFLOAT3(0.5f, -0.5f, -0.5f), XMFLOAT3(1.0f, 0.0f, 0.0f)},
+			{XMFLOAT3(0.5f, -0.5f,  0.5f), XMFLOAT3(1.0f, 0.0f, 1.0f)},
+			{XMFLOAT3(0.5f,  0.5f, -0.5f), XMFLOAT3(1.0f, 1.0f, 0.0f)},
+			{XMFLOAT3(0.5f,  0.5f,  0.5f), XMFLOAT3(1.0f, 1.0f, 1.0f)},
+		};
+
+	D3D11_SUBRESOURCE_DATA vertexBufferData = { 0 };
+	vertexBufferData.pSysMem = cubeVertices;
+	vertexBufferData.SysMemPitch = 0;
+	vertexBufferData.SysMemSlicePitch = 0;
+	CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(cubeVertices), D3D11_BIND_VERTEX_BUFFER);
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateBuffer(
+			&vertexBufferDesc,
+			&vertexBufferData,
+			&m_Coral3VertexBuffer
+		)
+	);
+
+	// Load mesh indices. Each trio of indices represents
+	// a triangle to be rendered on the screen.
+	// For example: 0,2,1 means that the vertices with indexes
+	// 0, 2 and 1 from the vertex buffer compose the 
+	// first triangle of this mesh.
+	static const unsigned short cubeIndices[] =
+	{
+		0,2,1, // -x
+		1,2,3,
+
+		4,5,6, // +x
+		5,7,6,
+
+		0,1,5, // -y
+		0,5,4,
+
+		2,6,7, // +y
+		2,7,3,
+
+		0,4,6, // -z
+		0,6,2,
+
+		1,3,7, // +z
+		1,7,5,
+	};
+
+	m_indexCount = ARRAYSIZE(cubeIndices);
+
+	D3D11_SUBRESOURCE_DATA indexBufferData = { 0 };
+	indexBufferData.pSysMem = cubeIndices;
+	indexBufferData.SysMemPitch = 0;
+	indexBufferData.SysMemSlicePitch = 0;
+	CD3D11_BUFFER_DESC indexBufferDesc(sizeof(cubeIndices), D3D11_BIND_INDEX_BUFFER);
+	DX::ThrowIfFailed(
+		m_deviceResources->GetD3DDevice()->CreateBuffer(
+			&indexBufferDesc,
+			&indexBufferData,
+			&m_Coral3IndexBuffer
+		)
+	);
+		});
+
+	// Once the cube is loaded, the object is ready to be rendered.
+	createCubeTask.then([this]() {
+		m_loadingComplete = true;
+		});
+}
+
+void ACW::Sample3DSceneRenderer::RenderCorals3()
+{
+	// Attach our vertex shader.
+	mContext->VSSetShader(
+		m_Coral3vertexShader.Get(),
+		nullptr,
+		0
+	);
+
+	// Attach our pixel shader.
+	mContext->PSSetShader(
+		m_Coral3pixelShader.Get(),
+		nullptr,
+		0
+	);
+
+	//Attach our domain shader
+	mContext->DSSetShader(
+		m_Coral3DomainShader.Get(),
+		nullptr,
+		0
+	);
+
+	//Attach our hull shader
+	mContext->HSSetShader(
+		m_Coral3HullShader.Get(),
+		nullptr,
+		0
+	);
+
+	// Draw the objects.
+	mContext->DrawIndexed(
+		m_indexCount,
+		0,
+		0
+	);
+}
+
 void ACW::Sample3DSceneRenderer::CreateBuffers()
 {
 	//Constant buffer for camera data
@@ -2479,116 +2909,38 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 	CreateRasteriserStates();
 	CreateSamplerState();
 
-	////Load All Shader Files
-	//auto loadVSTask = DX::ReadDataAsync(L"ImplicitShapesVertex.cso");
-	//auto loadPSTask = DX::ReadDataAsync(L"ImplicitShapesPixel.cso");
+	auto loadVSTask = DX::ReadDataAsync(L"BubblesRayTracerVertex.cso");
+	auto loadPSTask = DX::ReadDataAsync(L"BubblesRayTracerPixel.cso");
 
-	////Implicit primitives shaders
-	//auto loadVSTaskPrimitives = DX::ReadDataAsync(L"ImplicitPrimitivesVertex.cso");
-	//auto loadPSTaskPrimitives = DX::ReadDataAsync(L"ImplicitPrimitivesPixel.cso");
 
-	//Shiny spheres shaders
-	auto loadVSTaskSpheres = DX::ReadDataAsync(L"ShinySphereRayTracerVertex.cso");
-	auto loadPSTaskSpheres = DX::ReadDataAsync(L"ShinySphereRayTracerPixel.cso");
-
-//
-//#pragma region Implicit shapes
-//
-//	//After the vertex shader file is loaded, create the shader and input layout.
-//	auto ImplicitShapesVSTask = loadVSTask.then([this](const std::vector<byte>& fileData) {
-//		DX::ThrowIfFailed(
-//			m_deviceResources->GetD3DDevice()->CreateVertexShader(
-//				&fileData[0],
-//				fileData.size(),
-//				nullptr,
-//				&m_vertexShaderImplicitShapes
-//			)
-//		);
-//
-//	//Input layout
-//	static const D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-//	{
-//		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-//	};
-//
-//	DX::ThrowIfFailed(
-//		m_deviceResources->GetD3DDevice()->CreateInputLayout(
-//			vertexDesc,
-//			ARRAYSIZE(vertexDesc),
-//			&fileData[0],
-//			fileData.size(),
-//			&m_inputLayout
-//		)
-//	);
-//		});
-//
-//	//After the pixel shader file is loaded, create the shader.
-//	auto ImplicitShapesPSTask = loadPSTask.then([this](const std::vector<byte>& fileData) {
-//		DX::ThrowIfFailed(
-//			m_deviceResources->GetD3DDevice()->CreatePixelShader(
-//				&fileData[0],
-//				fileData.size(),
-//				nullptr,
-//				&m_pixelShaderImplicitShapes
-//			)
-//		);
-//		});
-//
-//#pragma endregion
-//
-//#pragma region Implicit primitives
-//
-//	//After the vertex shader file is loaded, create the shader.
-//	auto ImplicitPrimitivesVSTask = loadVSTaskPrimitives.then([this](const std::vector<byte>& fileData) {
-//		DX::ThrowIfFailed(
-//			m_deviceResources->GetD3DDevice()->CreateVertexShader(
-//				&fileData[0],
-//				fileData.size(),
-//				nullptr,
-//				&m_vertexShaderImplicitPrimitives
-//			)
-//		);
-//		});
-//
-//	//After the pixel shader file is loaded, create the shader.
-//	auto ImplicitPrimitivesPSTask = loadPSTaskPrimitives.then([this](const std::vector<byte>& fileData) {
-//		DX::ThrowIfFailed(
-//			m_deviceResources->GetD3DDevice()->CreatePixelShader(
-//				&fileData[0],
-//				fileData.size(),
-//				nullptr,
-//				&m_pixelShaderImplicitPrimitives
-//			)
-//		);
-//		});
-//
-//#pragma endregion
-
-#pragma region Shiny Spheres
+#pragma region Shiny Bubbles
 	//After the vertex shader file is loaded, create the shader
-	auto SpheresVSTask = loadVSTaskSpheres.then([this](const std::vector<byte>& fileData) {
+	auto SpheresVSTask = loadVSTask.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreateVertexShader(
 				&fileData[0],
 				fileData.size(),
 				nullptr,
-				&mVertexShaderSpheres
+				&mVertexShaderBubbles
 			)
 		);
 		});
 
 	//After the pixel shader file is loaded, create the shader
-	auto SpheresPSTask = loadPSTaskSpheres.then([this](const std::vector<byte>& fileData) {
+	auto SpheresPSTask = loadPSTask.then([this](const std::vector<byte>& fileData) {
 		DX::ThrowIfFailed(
 			m_deviceResources->GetD3DDevice()->CreatePixelShader(
 				&fileData[0],
 				fileData.size(),
 				nullptr,
-				&mPixelShaderSpheres
+				&mPixelShaderBubbles
 			)
 		);
 		});
 #pragma endregion
+
+	CreateCorals2();
+	CreateCorals3();
 	CreateCoral();
 	CreateTerrain();
 	CreateWater();
