@@ -59,5 +59,6 @@ GeometryShaderInput main(VertexShaderInput input)
     
 	output.position = float4(input.pos, 1);
     output.position.y = PatternShades(output.position.xz) + 0.1;
+    output.position.y -= 0.3f;
 	return output;
 }

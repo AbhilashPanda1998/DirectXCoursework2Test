@@ -21,6 +21,12 @@ cbuffer Light : register(b1)
     float4 lightColour;
 }
 
+cbuffer timeConstantBuffer : register(b2)
+{
+    float time;
+    float3 padding;
+}
+
 float Hash(float2 grid)
 {
     float h = dot(grid, float2(127.1, 311.7));
@@ -60,15 +66,15 @@ float4 main(PixelShaderInput input) : SV_TARGET
 {
     float4 finalColour = 0;
 
-    float4 ambientColour = float4(0, 0, 1, 0);
+    float4 ambientColour = float4(1, 0, 1, 0);
     float4 materialDiffuse = 0;
     float4 materialSpecular = 0;
     float4 texColour = 0;
     float noise = PatternShades(input.posWorld.xz);
 
     materialDiffuse = float4(0.8 * noise, 0.3 * noise, 0.3 * noise, 1.0);
-    materialSpecular = float4(0.9 * noise, 0.4 * noise, 0.4 * noise, 1.0);
-    texColour = float4(0.5 * noise, 0.7 * noise, 0.6 * noise, 1.0);
+    materialSpecular = float4(0.4 * noise, 0.4 * noise, 0.4 * noise, 1.0);
+    texColour = float4(0.7 * noise, 0.2 * noise, 0.4 * noise, 1.0);
 
     float4 viewDir = normalize(eye - input.posWorld);
     float4 lightDir = normalize(lightPos - input.posWorld);

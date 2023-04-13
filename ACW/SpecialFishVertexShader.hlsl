@@ -53,6 +53,6 @@ PixelShaderInput main(VertexShaderInput input)
     output.pos = mul(rotationMatrix, float4(input.pos, 1.0f));
     output.pos.xyz *= 0.015f;
     output.pos.x += 0.8f;
-    output.pos.x -= time * 0.005f;
+    output.pos.x -= time * 0.009f;
     return output;
 }
