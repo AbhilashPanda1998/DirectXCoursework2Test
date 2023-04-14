@@ -23,8 +23,6 @@ namespace ACW
 
 	private:
 		void RenderBubbles();
-		void RenderImplicitShapes();
-		void RenderImplicitPrimitives();
 		
 		//Water and terrain done using vertex, pixel, hull, and domain shader
 
@@ -102,14 +100,6 @@ namespace ACW
 		Microsoft::WRL::ComPtr<ID3D11Buffer> fish2IndexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> fish3VertexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> fish3IndexBuffer;
-
-		//Implicit shapes shaders
-		Microsoft::WRL::ComPtr<ID3D11VertexShader>	m_vertexShaderImplicitShapes;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader>	m_pixelShaderImplicitShapes;
-
-		//Implicit primitives shaders
-		Microsoft::WRL::ComPtr<ID3D11VertexShader>	m_vertexShaderImplicitPrimitives;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader>	m_pixelShaderImplicitPrimitives;
 
 		//Terrain shaders
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShaderTerrain;

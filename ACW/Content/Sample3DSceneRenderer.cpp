@@ -205,8 +205,6 @@ void Sample3DSceneRenderer::Render()
 
 
 	RenderBubbles();
-	RenderImplicitShapes();
-	RenderImplicitPrimitives();
 	RenderCorals1();
 
 	RenderFishes();
@@ -255,53 +253,6 @@ void ACW::Sample3DSceneRenderer::RenderBubbles()
 	);
 }
 
-void ACW::Sample3DSceneRenderer::RenderImplicitShapes()
-{
-	// Attach our vertex shader.
-	mContext->VSSetShader(
-		m_vertexShaderImplicitShapes.Get(),
-		nullptr,
-		0
-	);
-
-	// Attach our pixel shader.
-	mContext->PSSetShader(
-		m_pixelShaderImplicitShapes.Get(),
-		nullptr,
-		0
-	);
-
-	//Draw the objects.
-	mContext->DrawIndexed(
-		m_indexCount,
-		0,
-		0
-	);
-}
-
-void ACW::Sample3DSceneRenderer::RenderImplicitPrimitives()
-{
-	// Attach our vertex shader.
-	mContext->VSSetShader(
-		m_vertexShaderImplicitPrimitives.Get(),
-		nullptr,
-		0
-	);
-
-	// Attach our pixel shader.
-	mContext->PSSetShader(
-		m_pixelShaderImplicitPrimitives.Get(),
-		nullptr,
-		0
-	);
-
-	//Draw the objects.
-	mContext->DrawIndexed(
-		m_indexCount,
-		0,
-		0
-	);
-}
 
 void ACW::Sample3DSceneRenderer::CreateTerrain()
 {
@@ -2957,9 +2908,7 @@ void Sample3DSceneRenderer::CreateDeviceDependentResources()
 void Sample3DSceneRenderer::ReleaseDeviceDependentResources()
 {
 	m_loadingComplete = false;
-	m_vertexShaderImplicitShapes.Reset();
 	m_inputLayout.Reset();
-	m_pixelShaderImplicitShapes.Reset();
 	m_constantBufferCamera.Reset();
 	m_vertexBuffer.Reset();
 	m_indexBuffer.Reset();
