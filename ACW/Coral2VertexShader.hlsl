@@ -54,9 +54,9 @@ PixelShaderInput main(VertexShaderInput input)
     
     // Add additional transformations to create a complex shape
     
-
+    output.pos.xyz *= 0.7f;
     output.pos.x += 8;
-    output.pos.y += 2.5f;
+    output.pos.y += 1.5f;
 
     return output;
 }

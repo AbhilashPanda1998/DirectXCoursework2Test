@@ -33,18 +33,17 @@ struct Sphere
 };
 
 static Sphere spheres[NOBJECTS] = {
-	{ -5.0, -5.0, 0.0, 0.0010, sphereColour1, 0.3, 0.5, 0.7, shininess },
-    { 4.0, -5.0, 0.0, 0.0010, sphereColour2, 0.5, 0.7, 0.4, shininess },
-    { 1.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
-    { -2.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+	{ -5.0, -7.5, 0.0, 0.0010, sphereColour1, 0.3, 0.5, 0.7, shininess },
+    { 4.0, -8.2, 0.0, 0.0010, sphereColour2, 0.5, 0.7, 0.4, shininess },
+    { 1.5, -3.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+    { -2.5, -6.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
     { -3.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
-    { 8.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
-    { 7.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
-    { -10.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
-    { 4.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
-    { 2.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
-    { -4.5, -5.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
-
+    { 3.5, -1.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+    { 2.5, -1.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+    { 4.5, -4.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+    { 1.5, -6.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+    { 2.5, -3.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
+    { 3.5, -2.0, 0.0, 0.0010, sphereColour3, 0.5, 0.3, 0.3, shininess },
 };
 
 struct Ray

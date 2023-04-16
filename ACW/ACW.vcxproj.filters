@@ -132,24 +132,6 @@
     <FxCompile Include="Content\Corals1VertexShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
-    <FxCompile Include="Content\FishGeometryShader.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Content\FishPixelShader.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Content\FishVertexShader.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Content\Fish1GeometryShader.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Content\Fish1PixelShader.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Content\Fish1VertexShader.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
     <FxCompile Include="CoralPixelShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
@@ -157,24 +139,6 @@
       <Filter>Content</Filter>
     </FxCompile>
     <FxCompile Include="CoralGeometryShader.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Fish2GeometryShader.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Fish2PixelShader.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Fish2VertexShader.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Fish3GeometryShader.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Fish3VertexShader.hlsl">
-      <Filter>Content</Filter>
-    </FxCompile>
-    <FxCompile Include="Fish3PixelShader.hlsl">
       <Filter>Content</Filter>
     </FxCompile>
     <FxCompile Include="StarfishVertexShader.hlsl">

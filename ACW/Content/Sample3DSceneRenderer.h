@@ -36,10 +36,6 @@ namespace ACW
 
 		void CreateSeaWeeds();
 		void RenderSeaWeeds();
-
-		//Different types of fish experient using vertex, pixel and geometry shader
-		void CreateFishes();
-		void RenderFishes();
 		
 		void CreateStarfish();
 		void RenderStarfish();
@@ -114,19 +110,6 @@ namespace ACW
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> seaWeedsVertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> seaWeedsPixelShader;
 		Microsoft::WRL::ComPtr<ID3D11GeometryShader> seaWeedsGeometryShader;
- 
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> fishVertexShader;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> fishPixelShader;
-		Microsoft::WRL::ComPtr<ID3D11GeometryShader> fishGeometryShader;
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> fish1VertexShader;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> fish1PixelShader;
-		Microsoft::WRL::ComPtr<ID3D11GeometryShader> fish1GeometryShader;
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> fish2VertexShader;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> fish2PixelShader;
-		Microsoft::WRL::ComPtr<ID3D11GeometryShader> fish2GeometryShader;
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> fish3VertexShader;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> fish3PixelShader;
-		Microsoft::WRL::ComPtr<ID3D11GeometryShader> fish3GeometryShader;
 
 		//Water shaders
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShaderWater;
@@ -144,7 +127,6 @@ namespace ACW
 		//Corals1 shaders
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_Corals1VertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_Corals1PixelShader;
-
 
 		//Coral2 shaders
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Coral2VertexBuffer;
