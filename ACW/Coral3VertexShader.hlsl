@@ -31,7 +31,7 @@ PixelShaderInput main(VertexShaderInput input)
     output.pos = mul(float4(pos, 1.0f), model);
     output.pos = mul(output.pos, view);
     output.pos = mul(output.pos, projection);
-
+    
     output.pos.x += 8;
     output.pos.y += 8.5f;
 

@@ -197,7 +197,7 @@ namespace ACW
 		bool	m_loadingComplete;
 		XMVECTOR eye = { 0, 5, -10, 1 };
 		XMVECTOR at = { 0.0f, 5.0f, 1.0f, 0.0f };
-		XMVECTOR up = { 0.0f, 1.0f, 0.0f, 0.0f };
+		XMVECTOR up = { 0.0f, 2, 0.0f, 0.0f };
 		XMMATRIX lookAt;
 	};
 }

@@ -121,9 +121,8 @@ float2 castRay(in float3 ro, in float3 rd)
 }
 
 
-float calcSoftshadow(in float3 ro, in float3 rd, in float mint, in float tmax)
+float calculateSoftShadow(in float3 ro, in float3 rd, in float mint, in float tmax)
 {
-	// bounding volume
 	float tp = (maxHei - ro.y) / rd.y; if (tp > 0.0) tmax = min(tmax, tp);
 
 	float res = 1.0;
@@ -139,24 +138,14 @@ float calcSoftshadow(in float3 ro, in float3 rd, in float mint, in float tmax)
 
 float3 calcNormal(in float3 pos)
 {
-#if 1
 	float2 e = float2(1.0, -1.0)*0.5773*0.0005;
 	return normalize(e.xyy*map(pos + e.xyy).x +
 		e.yyx*map(pos + e.yyx).x +
 		e.yxy*map(pos + e.yxy).x +
-		e.xxx*map(pos + e.xxx).x);
-#else
-	float3 n = float3(0.0);
-	for (int i = ZERO; i < 4; i++)
-	{
-		float3 e = 0.5773*(2.0*float3((((i + 3) >> 1) & 1), ((i >> 1) & 1), (i & 1)) - 1.0);
-		n += e * map(pos + 0.0005*e).x;
-	}
-	return normalize(n);
-#endif    
+		e.xxx*map(pos + e.xxx).x);  
 }
 
-float calcAO(in float3 pos, in float3 nor)
+float calculateAmbientOcclusion(in float3 pos, in float3 nor)
 {
 	float occ = 0.0;
 	float sca = 1.0;
@@ -171,79 +160,63 @@ float calcAO(in float3 pos, in float3 nor)
 	return clamp(1.0 - 3.0*occ, 0.0, 1.0) * (0.5 + 0.5*nor.y);
 }
 
-float checkersGradBox(in float2 p)
+float3 renderObject(in float3 origin, in float3 direction)
 {
-	// filter kernel
-	float2 w = fwidth(p) + 0.001;
-	// analytical integral (box filter)
-	float2 i = 2.0*(abs(frac((p - 0.5*w)*0.5) - 0.5) - abs(frac((p + 0.5*w)*0.5) - 0.5)) / w;
-	// xor pattern
-	return 0.5 - 0.5*i.x*i.y;
-}
+    float3 color = float3(0.7, 0.9, 1.0) + direction.y * 0.8;
+    float2 result = castRay(origin, direction);
+    float t = result.x;
+    float distance = result.x;
+    float material = result.y;
+    if (material > -0.5)
+    {
+        float3 position = origin + distance * direction;
+        float4 depthPosition = mul(mul(float4(position, 1), view), projection);
+        output.depth = depthPosition.z / depthPosition.w;
+        float3 normal = (material < 1.5) ? float3(0.0, 1.0, 0.0) : calcNormal(position);
+        float3 reflection = reflect(direction, normal);
 
-float3 render(in float3 ro, in float3 rd)
-{
-	float3 col = float3(0.7, 0.9, 1.0) + rd.y*0.8;
-	float2 res = castRay(ro, rd);
-	float t = res.x;
-	float m = res.y;
-	if (m > -0.5)
-	{
-		float3 pos = ro + t * rd;
-		float4 depthPos = mul(mul(float4(pos, 1), view), projection);
-		output.depth = depthPos.z / depthPos.w;
-		float3 nor = (m < 1.5) ? float3(0.0, 1.0, 0.0) : calcNormal(pos);
-		float3 ref = reflect(rd, nor);
+        color = 0.45 + 0.35 * sin(float3(0.05, 0.08, 0.10) * (material - 1.0));
+		
+        float occlusion = calculateAmbientOcclusion(position, normal);
+        float3 lightDirection = normalize(float3(-10, 100, -10));
+        float3 halfVector = normalize(lightDirection - direction);
+        float ambient = clamp(0.5 + 0.5 * normal.y, 0.0, 1.0);
+        float diffuse = clamp(dot(normal, lightDirection), 0.0, 1.0);
+        float backscattering = clamp(dot(normal, normalize(float3(-lightDirection.x, 0.0, -lightDirection.z))), 0.0, 1.0) * clamp(1.0 - position.y, 0.0, 1.0);
+        float glossiness = smoothstep(-0.2, 0.2, reflection.y);
+        float fresnel = pow(clamp(1.0 + dot(normal, direction), 0.0, 1.0), 2.0);
 
-		// material        
-		col = 0.45 + 0.35*sin(float3(0.05, 0.08, 0.10)*(m - 1.0));
-		if (m < 1.5)
-		{
+        diffuse *= calculateSoftShadow(position, lightDirection, 0.02, 2.5);
+        glossiness *= calculateSoftShadow(position, reflection, 0.02, 2.5);
 
-			float f = checkersGradBox(5.0*pos.xz);
-			col = 0.3 + f * float3(0.1, 0.1, 0.1);
-		}
+        float specular = pow(clamp(dot(normal, halfVector), 0.0, 1.0), 16.0) *
+			diffuse *
+			(0.04 + 0.96 * pow(clamp(1.0 + dot(halfVector, direction), 0.0, 1.0), 5.0));
 
-		// lighting
-		float occ = calcAO(pos, nor);
-		float3  lig = normalize(float3(-10, 100, -10));
-		float3  hal = normalize(lig - rd);
-		float amb = clamp(0.5 + 0.5*nor.y, 0.0, 1.0);
-		float dif = clamp(dot(nor, lig), 0.0, 1.0);
-		float bac = clamp(dot(nor, normalize(float3(-lig.x, 0.0, -lig.z))), 0.0, 1.0)*clamp(1.0 - pos.y, 0.0, 1.0);
-		float dom = smoothstep(-0.2, 0.2, ref.y);
-		float fre = pow(clamp(1.0 + dot(nor, rd), 0.0, 1.0), 2.0);
+        float3 lighting = float3(0.0, 0.0, 0.0);
+        lighting += 1.30 * diffuse * float3(1.00, 0.80, 0.55);
+        lighting += 0.30 * ambient * float3(0.40, 0.60, 1.00) * occlusion;
+        lighting += 0.40 * glossiness * float3(0.40, 0.60, 1.00) * occlusion;
+        lighting += 0.50 * backscattering * float3(0.25, 0.25, 0.25) * occlusion;
+        lighting += 0.25 * fresnel * float3(1.00, 1.00, 1.00) * occlusion;
+        color = color * lighting;
+        color += 9.00 * specular * float3(1.00, 0.90, 0.70);
 
-		dif *= calcSoftshadow(pos, lig, 0.02, 2.5);
-		dom *= calcSoftshadow(pos, ref, 0.02, 2.5);
+        color = lerp(color, float3(0.8, 0.9, 1.0), 1.0 - exp(-0.0002 * t * t * t));
+    }
+    else
+    {
+        discard;
+    }
 
-		float spe = pow(clamp(dot(nor, hal), 0.0, 1.0), 16.0)*
-			dif *
-			(0.04 + 0.96*pow(clamp(1.0 + dot(hal, rd), 0.0, 1.0), 5.0));
+    return float3(clamp(color, 0.0, 1.0));
+};
 
-		float3 lin = float3(0.0, 0.0, 0.0);
-		lin += 1.30*dif*float3(1.00, 0.80, 0.55);
-		lin += 0.30*amb*float3(0.40, 0.60, 1.00)*occ;
-		lin += 0.40*dom*float3(0.40, 0.60, 1.00)*occ;
-		lin += 0.50*bac*float3(0.25, 0.25, 0.25)*occ;
-		lin += 0.25*fre*float3(1.00, 1.00, 1.00)*occ;
-		col = col * lin;
-		col += 9.00*spe*float3(1.00, 0.90, 0.70);
-
-		col = lerp(col, float3(0.8, 0.9, 1.0), 1.0 - exp(-0.0002*t*t*t));
-	}
-	else
-	{
-		discard;
-	}
-
-	return float3(clamp(col, 0.0, 1.0));
-}
 
 PixelShaderOutput main(VS_QUAD input)
 {
-	float zoom = 10.0;
-	float2 xy = zoom * input.canvasXY;
+	float zoomCam = 10.0;
+    float2 xy = zoomCam * input.canvasXY;
 	float distEyeToCanvas = nearPlane;
 	float3 pixelPos = float3(xy, -distEyeToCanvas);
 
@@ -251,7 +224,7 @@ PixelShaderOutput main(VS_QUAD input)
 	eyeRay.origin = eye.xyz;
 	eyeRay.direction = normalize(pixelPos - eye.xyz);
 
-	float3 pixelColour = render(eyeRay.origin, eyeRay.direction);
+    float3 pixelColour = renderObject(eyeRay.origin, eyeRay.direction);
 	output.colour = float4(pixelColour, 1.0);
 	return output;
 }
