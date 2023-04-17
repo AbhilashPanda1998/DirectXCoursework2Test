@@ -1,1 +1,1 @@
-Underwater environment done in DirectX and C++ 
+A UWP app done by writing a set of shaders in HLSL to implement a set of procedurally generated visual effects which can be used in a sea life-based game. All the objects rendered in the scene are created procedurally either as explicit triangle meshes or are rendered by using vertex shaders, geometry shaders and tessellation shaders.
